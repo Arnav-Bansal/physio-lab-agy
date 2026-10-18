@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Warm Architectural Stone & Teal Clinical Palette */
+    --background: 42 29% 95%; /* #F5F2EB Warm Stone Linen */
+    --foreground: 60 3% 8%;   /* #141413 Deep Charcoal Acrylic */
+    --card: 0 0% 100%;
+    --card-foreground: 60 3% 8%;
+    --primary: 184 100% 28%;  /* #00858E Primary Brand Teal */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 39 24% 88%;  /* #E8E2D7 Textured Linen Stone */
+    --secondary-foreground: 60 3% 8%;
+    --muted: 170 21% 90%;     /* #DCE8E6 Frosted Sage Glass */
+    --muted-foreground: 195 16% 32%;
+    --accent: 184 100% 33%;   /* #009CA6 Vibrant Aqua */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 38 18% 82%;
+    --input: 38 18% 82%;
+    --ring: 184 100% 28%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-[#F5F2EB] text-[#141413] antialiased selection:bg-[#00858E]/20 selection:text-[#006D75];
+  }
+}
+
+/* Subtle linen stone texture effect inspired by The Physio Lab reception feature wall */
+.bg-stone-linen {
+  background-color: #F5F2EB;
+  background-image: radial-gradient(rgba(0, 133, 142, 0.04) 1px, transparent 0),
+    linear-gradient(to right, rgba(214, 207, 194, 0.25) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(214, 207, 194, 0.25) 1px, transparent 1px);
+  background-size: 24px 24px, 64px 64px, 64px 64px;
+}
+
+.frosted-sage-panel {
+  background: rgba(220, 232, 230, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
