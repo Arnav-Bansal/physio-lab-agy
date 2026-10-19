@@ -12,6 +12,7 @@ import {
   Send,
   AlertTriangle,
   X,
+  CheckCheck,
 } from 'lucide-react';
 import type {
   MessageLogRecord,
@@ -42,7 +43,7 @@ export function MessagesCenterClient({
   const [dispatchingRowId, setDispatchingRowId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
-  // Manual Follow-up Modal state
+  // Manual Follow-up Drawer state
   const [showManualModal, setShowManualModal] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState(patients[0]?.id || '');
   const [customNote, setCustomNote] = useState(
@@ -65,6 +66,15 @@ export function MessagesCenterClient({
       return true;
     });
   }, [logs, statusFilter, triggerFilter]);
+
+  const kpiCounts = useMemo(() => {
+    const delivered = logs.filter(
+      (m) => m.status === 'delivered' || m.status === 'sent'
+    ).length;
+    const queued = logs.filter((m) => m.status === 'queued').length;
+    const failed = logs.filter((m) => m.status === 'failed').length;
+    return { total: logs.length, delivered, queued, failed };
+  }, [logs]);
 
   async function handleRunDispatchWorker() {
     setRunningQueue(true);
@@ -107,7 +117,7 @@ export function MessagesCenterClient({
               : m
           )
         );
-        setToast(`Message dispatched (${data.providerMessageId})`);
+        setToast(`WhatsApp message dispatched (${data.providerMessageId})`);
       } else {
         setLogs((prev) =>
           prev.map((m) =>
@@ -122,7 +132,7 @@ export function MessagesCenterClient({
           )
         );
         setToast(
-          `Message failed (${data.error}) — queued in exponential backoff retry queue (+2m / +10m / +30m).`
+          `Message failed (${data.error}) — scheduled in exponential backoff retry queue (+2m / +10m / +30m).`
         );
       }
       router.refresh();
@@ -159,7 +169,7 @@ export function MessagesCenterClient({
   return (
     <div className="space-y-6">
       {toast && (
-        <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-300 flex items-center justify-between gap-4 text-xs sm:text-sm font-bold text-emerald-800">
+        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-300 flex items-center justify-between gap-4 text-xs sm:text-sm font-bold text-emerald-800">
           <span className="flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
             <span>{toast}</span>
@@ -170,68 +180,101 @@ export function MessagesCenterClient({
         </div>
       )}
 
-      {/* Top Action & Filter Bar */}
-      <div className="bg-white rounded-lg p-5 sm:p-6 border border-border shadow-sm space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3.5 py-2.5 rounded-xl border border-border bg-muted/50 text-xs font-bold"
-            >
-              <option value="all">All Statuses ({logs.length})</option>
-              <option value="queued">Queued (Scheduled 24h / 2h Reminders)</option>
-              <option value="sent">Sent</option>
-              <option value="delivered">Delivered</option>
-              <option value="failed">Failed (In Retry Queue)</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-
-            <select
-              value={triggerFilter}
-              onChange={(e) => setTriggerFilter(e.target.value)}
-              className="px-3.5 py-2.5 rounded-xl border border-border bg-muted/50 text-xs font-bold"
-            >
-              <option value="all">All Lifecycle Triggers</option>
-              <option value="booking_confirmation">Booking Confirmation (Immediate)</option>
-              <option value="reminder_24h">24-Hour Prior Reminder</option>
-              <option value="reminder_2h">2-Hour Prior Reminder</option>
-              <option value="appointment_cancelled">Appointment Cancelled</option>
-              <option value="appointment_no_show">Missed Appointment (No-Show)</option>
-              <option value="manual_followup">Manual CRM Follow-Up</option>
-              <option value="otp_verification">Patient Portal OTP Login</option>
-            </select>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2.5">
-            <button
-              type="button"
-              disabled={runningQueue}
-              onClick={handleRunDispatchWorker}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-muted/50 hover:bg-secondary text-foreground border border-border text-xs font-semibold transition-colors"
-            >
-              {runningQueue ? (
-                <Loader2 className="h-4 w-4 animate-spin text-primary" />
-              ) : (
-                <Play className="h-4 w-4 text-primary" />
-              )}
-              <span>Run Reminder &amp; Retry Worker Now</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setShowManualModal(true)}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-semibold shadow-sm transition-colors"
-            >
-              <Send className="h-3.5 w-3.5" />
-              <span>+ Send Manual Follow-Up</span>
-            </button>
-          </div>
+      {/* Delivery Funnel KPI Row */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white rounded-2xl p-5 border border-border shadow-sm">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            Total Lifecycle Events
+          </span>
+          <p className="text-2xl sm:text-3xl font-bold font-mono text-foreground mt-1">
+            {kpiCounts.total}
+          </p>
+        </div>
+        <div className="bg-white rounded-2xl p-5 border border-border shadow-sm">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">
+            Sent &amp; Delivered
+          </span>
+          <p className="text-2xl sm:text-3xl font-bold font-mono text-emerald-700 mt-1">
+            {kpiCounts.delivered}
+          </p>
+        </div>
+        <div className="bg-white rounded-2xl p-5 border border-border shadow-sm">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-primary">
+            Scheduled Reminders (24h/2h)
+          </span>
+          <p className="text-2xl sm:text-3xl font-bold font-mono text-primary mt-1">
+            {kpiCounts.queued}
+          </p>
+        </div>
+        <div className="bg-white rounded-2xl p-5 border border-border shadow-sm">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-red-700">
+            Retry Queue (Backoff)
+          </span>
+          <p className="text-2xl sm:text-3xl font-bold font-mono text-red-600 mt-1">
+            {kpiCounts.failed}
+          </p>
         </div>
       </div>
 
-      {/* Central Message Log List */}
-      <div className="space-y-3">
+      {/* Top Action & Filter Bar */}
+      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-border shadow-sm flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-3.5 py-2.5 rounded-xl border border-border bg-muted/40 text-xs font-bold"
+          >
+            <option value="all">All Statuses ({logs.length})</option>
+            <option value="queued">Queued (24h / 2h Reminders)</option>
+            <option value="sent">Sent</option>
+            <option value="delivered">Delivered</option>
+            <option value="failed">Failed (In Retry Queue)</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+
+          <select
+            value={triggerFilter}
+            onChange={(e) => setTriggerFilter(e.target.value)}
+            className="px-3.5 py-2.5 rounded-xl border border-border bg-muted/40 text-xs font-bold"
+          >
+            <option value="all">All Lifecycle Triggers</option>
+            <option value="booking_confirmation">Booking Confirmation (Immediate)</option>
+            <option value="reminder_24h">24-Hour Prior Reminder</option>
+            <option value="reminder_2h">2-Hour Prior Reminder</option>
+            <option value="appointment_cancelled">Appointment Cancelled</option>
+            <option value="appointment_no_show">Missed Appointment (No-Show)</option>
+            <option value="manual_followup">Manual Care Follow-Up</option>
+          </select>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            type="button"
+            disabled={runningQueue}
+            onClick={handleRunDispatchWorker}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-muted/60 hover:bg-secondary text-foreground border border-border text-xs font-bold transition-colors"
+          >
+            {runningQueue ? (
+              <Loader2 className="h-4 w-4 animate-spin text-primary" />
+            ) : (
+              <Play className="h-4 w-4 text-primary" />
+            )}
+            <span>Process Due Reminders &amp; Retries</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowManualModal(true)}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-colors"
+          >
+            <Send className="h-3.5 w-3.5" />
+            <span>+ Send WhatsApp Follow-Up</span>
+          </button>
+        </div>
+      </div>
+
+      {/* WhatsApp Chat-Style Message Feed */}
+      <div className="grid grid-cols-1 gap-3.5">
         {filteredLogs.map((log) => {
           const tpl = templateMap.get(log.trigger_type);
           const renderedBody = tpl
@@ -241,18 +284,18 @@ export function MessagesCenterClient({
           return (
             <div
               key={log.id}
-              className="bg-white rounded-lg p-5 sm:p-6 border border-border shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-5"
+              className="bg-white rounded-2xl p-5 sm:p-6 border border-border shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-5"
             >
-              <div className="space-y-2 max-w-3xl">
+              <div className="space-y-3 max-w-3xl flex-1">
                 <div className="flex items-center gap-2.5 flex-wrap">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary text-[#006D75] text-xs font-semibold uppercase tracking-wider">
-                    <MessageSquare className="h-3.5 w-3.5" />
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary text-secondary-foreground text-xs font-bold uppercase tracking-wider">
+                    <MessageSquare className="h-3.5 w-3.5 text-primary" />
                     {log.trigger_type.replace(/_/g, ' ')}
                   </span>
 
                   <span
                     className={cn(
-                      'px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase',
+                      'px-2.5 py-0.5 rounded-full font-mono text-[11px] font-bold uppercase',
                       log.status === 'delivered' || log.status === 'sent'
                         ? 'bg-emerald-100 text-emerald-800'
                         : log.status === 'queued'
@@ -262,41 +305,30 @@ export function MessagesCenterClient({
                         : 'bg-gray-100 text-gray-600'
                     )}
                   >
-                    {log.status} (Attempts: {log.attempts}/{log.max_attempts})
+                    {log.status} • {log.attempts}/{log.max_attempts}
                   </span>
 
-                  <span className="text-xs font-bold text-foreground">
-                    To: {formatPhoneDisplay(log.recipient_phone)}
+                  <span className="text-xs font-mono font-bold text-foreground">
+                    Recipient: {formatPhoneDisplay(log.recipient_phone)}
                   </span>
                 </div>
 
-                {/* Rendered Dynamic Variables Message Preview */}
-                <p className="text-xs sm:text-sm text-foreground/85 bg-muted/50 p-3.5 rounded-lg border border-border">
-                  {renderedBody}
-                </p>
-
-                <div className="flex flex-wrap items-center gap-4 text-[11px] text-muted-foreground">
-                  <span className="inline-flex items-center gap-1">
-                    <Clock className="h-3 w-3 text-primary" />
-                    Scheduled For: <strong>{formatDateTimeIST(log.scheduled_for)}</strong>
-                  </span>
-                  {log.sent_at && (
-                    <span>Sent At: {formatDateTimeIST(log.sent_at)}</span>
-                  )}
-                  {log.provider_message_id && (
-                    <span className="font-mono text-[10px]">
-                      ID: {log.provider_message_id}
-                    </span>
-                  )}
+                {/* Authentic WhatsApp Bubble Preview */}
+                <div className="relative rounded-2xl rounded-tl-sm bg-[#ECFDF5] border border-emerald-200/90 p-4 text-xs sm:text-sm text-emerald-950 shadow-sm">
+                  <p className="leading-relaxed">{renderedBody}</p>
+                  <div className="flex items-center justify-end gap-1.5 text-[10px] font-mono text-emerald-700/80 mt-2">
+                    <span>{formatDateTimeIST(log.scheduled_for)}</span>
+                    <CheckCheck className="h-3.5 w-3.5 text-emerald-600" />
+                  </div>
                 </div>
 
                 {log.last_error && (
-                  <div className="p-2.5 rounded-xl bg-red-50 border border-red-200 text-xs font-semibold text-red-700 flex items-center gap-2">
+                  <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs font-semibold text-red-700 flex items-center gap-2">
                     <AlertTriangle className="h-4 w-4 shrink-0" />
                     <span>
-                      Last Error: {log.last_error}
+                      Delivery Error: {log.last_error}
                       {log.next_retry_at
-                        ? ` • Next Retry At: ${formatDateTimeIST(log.next_retry_at)}`
+                        ? ` • Next Retry: ${formatDateTimeIST(log.next_retry_at)}`
                         : ''}
                     </span>
                   </div>
@@ -310,14 +342,14 @@ export function MessagesCenterClient({
                     type="button"
                     disabled={dispatchingRowId === log.id}
                     onClick={() => handleDispatchSingleRow(log.id, false)}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-semibold transition-colors"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-bold transition-colors"
                   >
                     {dispatchingRowId === log.id ? (
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
                     ) : (
                       <RefreshCw className="h-3.5 w-3.5" />
                     )}
-                    <span>{log.status === 'failed' ? 'Retry Dispatch Now' : 'Send Now'}</span>
+                    <span>{log.status === 'failed' ? 'Retry Dispatch' : 'Dispatch Now'}</span>
                   </button>
                 )}
 
@@ -326,9 +358,9 @@ export function MessagesCenterClient({
                     type="button"
                     disabled={dispatchingRowId === log.id}
                     onClick={() => handleDispatchSingleRow(log.id, true)}
-                    className="px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-[11px] font-bold transition-colors"
+                    className="px-3 py-2 rounded-xl bg-muted/60 hover:bg-amber-50 text-muted-foreground hover:text-amber-800 border border-border text-[11px] font-semibold transition-colors"
                   >
-                    Test Retry Queue
+                    Simulate Retry
                   </button>
                 )}
               </div>
@@ -337,23 +369,29 @@ export function MessagesCenterClient({
         })}
       </div>
 
-      {/* Send Manual Follow-Up Modal */}
+      {/* Slide-Over Send Manual Follow-Up Drawer */}
       {showManualModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg max-w-lg w-full p-6 sm:p-8 border border-border shadow-2xl space-y-5">
-            <div className="flex items-center justify-between border-b border-[#E8E2D7] pb-4">
+        <div
+          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex justify-end"
+          onClick={() => setShowManualModal(false)}
+        >
+          <div
+            className="bg-white max-w-md w-full h-full p-6 sm:p-8 border-l border-border shadow-2xl space-y-5 overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-border pb-4">
               <div>
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
-                  Meta WhatsApp Cloud API
+                <span className="text-[10px] font-bold uppercase tracking-widest text-primary">
+                  WhatsApp Patient Care
                 </span>
-                <h2 className="text-xl font-semibold text-foreground">
-                  Trigger Manual Patient Follow-Up
+                <h2 className="text-xl font-bold text-foreground mt-0.5">
+                  Send Manual Follow-Up
                 </h2>
               </div>
               <button
                 type="button"
                 onClick={() => setShowManualModal(false)}
-                className="p-2 rounded-xl bg-muted/50 text-foreground"
+                className="p-2 rounded-xl bg-muted/60 text-foreground"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -361,13 +399,13 @@ export function MessagesCenterClient({
 
             <form onSubmit={handleSendManualFollowUp} className="space-y-4 text-xs sm:text-sm">
               <div>
-                <label className="block text-xs font-bold uppercase mb-1">
+                <label className="block text-xs font-bold uppercase text-muted-foreground mb-1">
                   Select Patient *
                 </label>
                 <select
                   value={selectedPatientId}
                   onChange={(e) => setSelectedPatientId(e.target.value)}
-                  className="w-full px-3.5 py-3 rounded-xl border border-border bg-muted/50 font-bold"
+                  className="w-full px-3.5 py-3 rounded-xl border border-border bg-muted/40 font-bold"
                 >
                   {patients.map((pt) => (
                     <option key={pt.id} value={pt.id}>
@@ -378,19 +416,19 @@ export function MessagesCenterClient({
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase mb-1">
-                  Specialist / Follow-Up Context (`{'{{physio}}'}` variable)
+                <label className="block text-xs font-bold uppercase text-muted-foreground mb-1">
+                  Follow-Up Context / Specialist Message
                 </label>
-                <input
-                  type="text"
+                <textarea
+                  rows={3}
                   required
                   value={customNote}
                   onChange={(e) => setCustomNote(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50"
+                  className="w-full p-3.5 rounded-xl border border-border bg-muted/40"
                 />
               </div>
 
-              <div className="flex justify-end gap-3 pt-2">
+              <div className="flex justify-end gap-3 pt-4 border-t border-border">
                 <button
                   type="button"
                   onClick={() => setShowManualModal(false)}
@@ -401,10 +439,10 @@ export function MessagesCenterClient({
                 <button
                   type="submit"
                   disabled={sendingManual}
-                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-white font-semibold"
+                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-md"
                 >
                   {sendingManual && <Loader2 className="h-4 w-4 animate-spin" />}
-                  <span>Send WhatsApp Message</span>
+                  <span>Dispatch WhatsApp</span>
                 </button>
               </div>
             </form>

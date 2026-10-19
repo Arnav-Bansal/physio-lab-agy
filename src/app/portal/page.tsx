@@ -12,6 +12,9 @@ import {
   ArrowRight,
   CheckCircle2,
   Image as ImageIcon,
+  Activity,
+  BellRing,
+  Sparkles,
 } from 'lucide-react';
 import { getPatientSession } from '@/lib/auth/session';
 import { repositories } from '@/lib/repositories';
@@ -19,6 +22,25 @@ import { formatDateIST, formatTimeIST, formatDateTimeIST, formatPhoneDisplay } f
 import { CancelAppointmentButton } from '@/components/portal/cancel-appointment-button';
 
 export const dynamic = 'force-dynamic';
+
+function formatTriggerLabel(triggerType: string) {
+  switch (triggerType) {
+    case 'booking_confirmation':
+      return 'Instant Booking Confirmation';
+    case 'reminder_24h':
+      return '24-Hour Prior Visit Reminder';
+    case 'reminder_2h':
+      return '2-Hour Prior Visit Alert';
+    case 'appointment_cancelled':
+      return 'Cancellation Notice';
+    case 'appointment_no_show':
+      return 'Missed Visit Follow-Up';
+    case 'manual_followup':
+      return 'Care Team Check-In';
+    default:
+      return triggerType.replace(/_/g, ' ');
+  }
+}
 
 export default async function PatientPortalDashboard() {
   const session = await getPatientSession();
@@ -33,123 +55,168 @@ export default async function PatientPortalDashboard() {
 
   const upcomingAppointments = appointments.filter((a) => a.status === 'scheduled');
   const completedConsultations = history.filter((h) => h.consultation_status === 'completed');
+  const latestCompleted = completedConsultations[0] || null;
+
+  // Parse home exercises from latest treatment_plan if available
+  const homeExercises = latestCompleted?.treatment_plan
+    ? latestCompleted.treatment_plan
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean)
+    : [];
 
   return (
-    <div className="space-y-6">
-      {/* Clean Welcome Header matching physio-lab.lovable.app */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-primary">
-            Welcome, {session.fullName}
+    <div className="space-y-8">
+      {/* ====================================================================
+          1. HOSPITALITY-GRADE PATIENT RECOVERY BANNER
+      ==================================================================== */}
+      <div className="bg-gradient-to-r from-[#141E1E] via-[#00646B] to-[#00858E] rounded-2xl p-6 sm:p-8 lg:p-10 text-white shadow-xl flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div className="space-y-2.5">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider bg-white/15 px-3 py-1 rounded-full text-[#5EEAD4]">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              <span>WhatsApp Verified • {formatPhoneDisplay(session.phone)}</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-medium bg-white/10 px-3 py-1 rounded-full text-white/85">
+              <BellRing className="h-3 w-3 text-[#5EEAD4]" />
+              <span>24h &amp; 2h Automated WhatsApp Reminders Active</span>
+            </span>
+          </div>
+
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">
+            Welcome back, {session.fullName}
           </h1>
-          <p className="text-muted-foreground">
-            Manage your upcoming appointments, consultation notes, and prescriptions.
+          <p className="text-sm text-white/80 max-w-2xl leading-relaxed">
+            Track your rehabilitation schedule at <strong>The Physio Lab — Barewal Awana</strong>,
+            follow your daily home exercise protocol, and download your digital prescriptions.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+        <div className="flex flex-wrap items-center gap-3 shrink-0">
           <Link
             href="/portal/book"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 font-medium text-sm shadow-sm transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-white text-[#00646B] hover:bg-white/90 font-bold text-xs sm:text-sm shadow-md transition-all"
           >
             <CalendarPlus className="h-4 w-4" />
-            <span>Book New Appointment</span>
+            <span>Book New Session</span>
           </Link>
           <Link
             href="/portal/prescriptions"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-input bg-card hover:bg-accent hover:text-accent-foreground font-medium text-sm transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl bg-white/15 hover:bg-white/25 text-white font-semibold text-xs sm:text-sm border border-white/20 transition-all"
           >
-            <FileText className="h-4 w-4 text-primary" />
-            <span>My Prescriptions ({prescriptions.length})</span>
+            <FileText className="h-4 w-4 text-[#5EEAD4]" />
+            <span>Rx Vault ({prescriptions.length})</span>
           </Link>
         </div>
       </div>
 
-      {/* Quick KPI Summary Row */}
+      {/* ====================================================================
+          2. QUICK RECOVERY METRICS ROW
+      ==================================================================== */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        <div className="bg-white rounded-lg p-5 border border-border shadow-sm flex items-center justify-between">
+        <Link
+          href="/portal/book"
+          className="bg-white rounded-2xl p-5 border border-border shadow-sm hover:border-primary/40 transition-all flex items-center justify-between"
+        >
           <div>
             <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
               Upcoming Sessions
             </p>
-            <p className="text-3xl font-semibold text-primary mt-1">
+            <p className="text-3xl font-bold font-mono text-primary mt-1">
               {upcomingAppointments.length}
             </p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              Scheduled at Barewal Awana
+            </p>
           </div>
-          <div className="h-12 w-12 rounded-lg bg-secondary text-primary flex items-center justify-center">
+          <div className="h-12 w-12 rounded-xl bg-secondary text-primary flex items-center justify-center">
             <CalendarCheck className="h-6 w-6" />
           </div>
-        </div>
+        </Link>
 
-        <div className="bg-white rounded-lg p-5 border border-border shadow-sm flex items-center justify-between">
+        <Link
+          href="/portal/history"
+          className="bg-white rounded-2xl p-5 border border-border shadow-sm hover:border-primary/40 transition-all flex items-center justify-between"
+        >
           <div>
             <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              Completed Consultations
+              Completed Sessions
             </p>
-            <p className="text-3xl font-semibold text-foreground mt-1">
+            <p className="text-3xl font-bold font-mono text-foreground mt-1">
               {completedConsultations.length}
             </p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              Clinical SOAP notes &amp; plans
+            </p>
           </div>
-          <div className="h-12 w-12 rounded-lg bg-muted/50 text-foreground flex items-center justify-center">
+          <div className="h-12 w-12 rounded-xl bg-muted text-foreground flex items-center justify-center">
             <Stethoscope className="h-6 w-6" />
           </div>
-        </div>
+        </Link>
 
-        <div className="bg-white rounded-lg p-5 border border-border shadow-sm flex items-center justify-between">
+        <Link
+          href="/portal/prescriptions"
+          className="bg-white rounded-2xl p-5 border border-border shadow-sm hover:border-primary/40 transition-all flex items-center justify-between"
+        >
           <div>
             <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
               Digital Prescriptions
             </p>
-            <p className="text-3xl font-semibold text-primary mt-1">
+            <p className="text-3xl font-bold font-mono text-primary mt-1">
               {prescriptions.length}
             </p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              PDF &amp; Image exercise charts
+            </p>
           </div>
-          <div className="h-12 w-12 rounded-lg bg-secondary text-primary flex items-center justify-center">
+          <div className="h-12 w-12 rounded-xl bg-secondary text-primary flex items-center justify-center">
             <FileText className="h-6 w-6" />
           </div>
-        </div>
+        </Link>
       </div>
 
-      {/* Main Two-Column Grid */}
+      {/* ====================================================================
+          3. MAIN TWO-COLUMN CLINICAL PORTAL WORKSPACE
+      ==================================================================== */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left 7 Cols: Upcoming Appointments & Latest Clinical Consultation */}
+        {/* Left 7 Cols: Boarding-Pass Appointment Tickets + Active Home Rehab Checklist */}
         <div className="lg:col-span-7 space-y-6">
           {/* Upcoming Appointments Card */}
-          <div className="bg-white rounded-lg p-6 sm:p-7 border border-border shadow-sm">
+          <div className="bg-white rounded-2xl p-6 sm:p-7 border border-border shadow-sm">
             <div className="flex items-center justify-between gap-4 mb-5">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-primary">
-                  Live Schedule
+                  Confirmed Schedule
                 </span>
-                <h2 className="text-xl font-semibold text-foreground">
-                  Upcoming Appointments
+                <h2 className="text-xl font-bold text-foreground">
+                  Upcoming Appointments ({upcomingAppointments.length})
                 </h2>
               </div>
               <Link
                 href="/portal/book"
-                className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-secondary text-secondary-foreground text-xs font-bold hover:bg-primary hover:text-white transition-colors"
               >
-                <span>+ Book Slot</span>
-                <ArrowRight className="h-3.5 w-3.5" />
+                <CalendarPlus className="h-3.5 w-3.5" />
+                <span>Book Slot</span>
               </Link>
             </div>
 
             {upcomingAppointments.length === 0 ? (
-              <div className="bg-muted/50 rounded-lg p-8 text-center border border-dashed border-border">
-                <CalendarCheck className="h-8 w-8 text-primary mx-auto mb-2" />
-                <p className="text-sm font-bold text-foreground">
+              <div className="bg-muted/50 rounded-2xl p-8 text-center border border-dashed border-border">
+                <CalendarCheck className="h-9 w-9 text-primary mx-auto mb-2.5" />
+                <p className="text-base font-bold text-foreground">
                   No upcoming appointments scheduled
                 </p>
-                <p className="text-xs text-foreground/65 mt-1 mb-4">
-                  Book your next physiotherapy or sports injury session online with instant WhatsApp
-                  confirmation.
+                <p className="text-xs text-muted-foreground mt-1 mb-5 max-w-md mx-auto">
+                  Book your next physiotherapy, spine care, or Desmotec sports recovery session
+                  online with instant WhatsApp confirmation.
                 </p>
                 <Link
                   href="/portal/book"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-xs font-bold"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow-sm"
                 >
                   <CalendarPlus className="h-4 w-4" />
-                  <span>Book Appointment</span>
+                  <span>Book Appointment Now</span>
                 </Link>
               </div>
             ) : (
@@ -157,133 +224,154 @@ export default async function PatientPortalDashboard() {
                 {upcomingAppointments.map((appt) => (
                   <div
                     key={appt.id}
-                    className="rounded-lg p-5 bg-muted/50 border border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                    className="rounded-2xl p-5 bg-muted/40 border border-border hover:border-primary/40 transition-all space-y-4"
                   >
-                    <div className="space-y-1.5">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider bg-primary text-white">
-                          Scheduled
-                        </span>
-                        <span className="text-xs font-semibold text-muted-foreground">
-                          {appt.manual_duration_mins} mins session
-                        </span>
-                      </div>
-                      <p className="text-base font-semibold text-foreground">
-                        {formatDateIST(appt.start_time)} • {formatTimeIST(appt.start_time)} –{' '}
-                        {formatTimeIST(appt.end_time)}
-                      </p>
-                      <p className="text-xs font-semibold text-primary flex items-center gap-1.5">
-                        <Stethoscope className="h-3.5 w-3.5" />
-                        <span>
-                          {appt.physio?.full_name || 'Assigned Clinic Specialist'}
-                          {appt.physio?.specialization ? ` (${appt.physio.specialization})` : ''}
-                        </span>
-                      </p>
-                      <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-                        <MapPin className="h-3.5 w-3.5 text-primary" />
-                        <span>{appt.clinic?.name || 'The Physio Lab — Barewal Awana'}</span>
-                      </p>
-                      {appt.chief_complaint && (
-                        <p className="text-xs text-muted-foreground bg-white px-3 py-1.5 rounded-lg border border-border mt-2">
-                          <strong>Reason:</strong> {appt.chief_complaint}
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                      <div className="space-y-1.5">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-primary text-white">
+                            Confirmed Slot
+                          </span>
+                          <span className="font-mono text-xs font-semibold text-foreground bg-white px-2.5 py-0.5 rounded-md border border-border">
+                            {appt.manual_duration_mins} Mins
+                          </span>
+                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                            <MessageSquare className="h-3 w-3 text-emerald-600" />
+                            <span>24h &amp; 2h Alerts Active</span>
+                          </span>
+                        </div>
+
+                        <p className="text-lg font-bold font-mono text-foreground pt-1">
+                          {formatDateIST(appt.start_time)} • {formatTimeIST(appt.start_time)} –{' '}
+                          {formatTimeIST(appt.end_time)}
                         </p>
-                      )}
+
+                        <p className="text-xs font-semibold text-primary flex items-center gap-1.5">
+                          <Stethoscope className="h-3.5 w-3.5" />
+                          <span>
+                            {appt.physio?.full_name || 'Assigned Clinic Specialist'}
+                            {appt.physio?.specialization ? ` • ${appt.physio.specialization}` : ''}
+                          </span>
+                        </p>
+
+                        <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                          <MapPin className="h-3.5 w-3.5 text-primary" />
+                          <span>{appt.clinic?.name || 'The Physio Lab — Barewal Awana'}</span>
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <CancelAppointmentButton appointmentId={appt.id} />
+                      </div>
                     </div>
 
-                    <div className="flex sm:flex-col items-end justify-between gap-2 shrink-0">
-                      <CancelAppointmentButton appointmentId={appt.id} />
-                    </div>
+                    {appt.chief_complaint && (
+                      <div className="text-xs text-muted-foreground bg-white px-3.5 py-2.5 rounded-xl border border-border/80">
+                        <strong className="text-foreground">Session Focus:</strong>{' '}
+                        {appt.chief_complaint}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Recent Consultation Summary Card */}
-          <div className="bg-white rounded-lg p-6 sm:p-7 border border-border shadow-sm">
-            <div className="flex items-center justify-between gap-4 mb-5">
+          {/* Active Home Exercise & Rehab Plan (Hinge Health / Sword Health Inspired) */}
+          <div className="bg-white rounded-2xl p-6 sm:p-7 border border-border shadow-sm space-y-5">
+            <div className="flex items-center justify-between gap-4">
               <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-primary">
-                  Clinical Records
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-primary">
+                  <Activity className="h-3.5 w-3.5" />
+                  <span>Active Recovery Protocol</span>
                 </span>
-                <h2 className="text-xl font-semibold text-foreground">
-                  Recent Consultation History
+                <h2 className="text-xl font-bold text-foreground mt-0.5">
+                  Prescribed Home Exercise &amp; Rehab Plan
                 </h2>
               </div>
               <Link
                 href="/portal/history"
                 className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1"
               >
-                <span>View Full History</span>
+                <span>All Consultations</span>
                 <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
 
-            {completedConsultations.length === 0 ? (
-              <p className="text-xs text-foreground/65 py-6 text-center">
-                Completed consultation records and rehab notes will appear here after your visit.
+            {!latestCompleted ? (
+              <p className="text-xs text-muted-foreground py-6 text-center bg-muted/40 rounded-xl border border-border">
+                Your physiotherapist&apos;s prescribed home exercises and clinical diagnosis will
+                appear here after your consultation.
               </p>
             ) : (
               <div className="space-y-4">
-                {completedConsultations.slice(0, 2).map((item) => (
-                  <div
-                    key={item.appointment_id}
-                    className="rounded-lg p-5 bg-muted/50 border border-border space-y-3"
-                  >
-                    <div className="flex items-center justify-between gap-2 flex-wrap">
-                      <span className="text-xs font-bold text-primary">
-                        {formatDateIST(item.appointment_start)} • {item.physio_name}
-                      </span>
-                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">
-                        Completed Consultation
-                      </span>
-                    </div>
-
-                    {item.diagnosis && (
-                      <p className="text-sm font-semibold text-foreground">
-                        Diagnosis: {item.diagnosis}
-                      </p>
-                    )}
-
-                    {item.treatment_plan && (
-                      <div className="bg-white rounded-xl p-3.5 border border-border text-xs text-foreground/85 whitespace-pre-line">
-                        <strong className="block text-primary uppercase tracking-wider text-[10px] mb-1">
-                          Prescribed Rehab Protocol:
-                        </strong>
-                        {item.treatment_plan}
-                      </div>
-                    )}
+                <div className="p-4 rounded-xl bg-secondary/50 border border-primary/20 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
+                      Latest Clinical Diagnosis ({formatDateIST(latestCompleted.appointment_start)})
+                    </span>
+                    <p className="text-sm font-bold text-foreground mt-0.5">
+                      {latestCompleted.diagnosis ||
+                        latestCompleted.chief_complaint ||
+                        'Physiotherapy & Rehabilitation Assessment'}
+                    </p>
                   </div>
-                ))}
+                  <span className="text-xs font-semibold text-primary">
+                    {latestCompleted.physio_name}
+                  </span>
+                </div>
+
+                {homeExercises.length > 0 && (
+                  <div className="space-y-2.5">
+                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                      Daily Rehab Protocol ({homeExercises.length} Steps)
+                    </p>
+                    <div className="grid grid-cols-1 gap-2.5">
+                      {homeExercises.map((exercise, idx) => (
+                        <div
+                          key={idx}
+                          className="p-3.5 rounded-xl bg-muted/50 border border-border flex items-start gap-3 text-xs sm:text-sm text-foreground"
+                        >
+                          <span className="h-6 w-6 rounded-lg bg-primary text-white font-mono text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                            {idx + 1}
+                          </span>
+                          <span className="leading-relaxed font-medium">
+                            {exercise.replace(/^\d+[\.\)]\s*/, '')}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
         </div>
 
-        {/* Right 5 Cols: Digital Prescriptions & WhatsApp Reminders Log */}
+        {/* Right 5 Cols: Digital Prescriptions Vault & Clean WhatsApp Care Feed */}
         <div className="lg:col-span-5 space-y-6">
           {/* Prescriptions Quick Vault */}
-          <div className="bg-white rounded-lg p-6 sm:p-7 border border-border shadow-sm">
+          <div className="bg-white rounded-2xl p-6 sm:p-7 border border-border shadow-sm">
             <div className="flex items-center justify-between gap-4 mb-5">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-primary">
-                  PDF &amp; Image Attachments
+                  PDF &amp; Image Exercise Charts
                 </span>
-                <h2 className="text-xl font-semibold text-foreground">
-                  My Prescriptions
+                <h2 className="text-xl font-bold text-foreground">
+                  My Prescriptions ({prescriptions.length})
                 </h2>
               </div>
               <Link
                 href="/portal/prescriptions"
                 className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1"
               >
-                <span>Open Vault</span>
+                <span>Open Full Vault</span>
                 <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
 
             {prescriptions.length === 0 ? (
-              <p className="text-xs text-foreground/65 py-6 text-center">
+              <p className="text-xs text-muted-foreground py-6 text-center bg-muted/40 rounded-xl border border-border">
                 No prescriptions uploaded yet.
               </p>
             ) : (
@@ -291,10 +379,10 @@ export default async function PatientPortalDashboard() {
                 {prescriptions.map((presc) => (
                   <div
                     key={presc.id}
-                    className="p-4 rounded-lg bg-muted/50 border border-border flex items-center justify-between gap-3"
+                    className="p-4 rounded-xl bg-muted/40 border border-border hover:border-primary/40 transition-all flex items-center justify-between gap-3"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                      <div className="h-10 w-10 rounded-xl bg-secondary text-primary flex items-center justify-center shrink-0">
                         {presc.file_type === 'pdf' ? (
                           <FileText className="h-5 w-5" />
                         ) : (
@@ -302,11 +390,16 @@ export default async function PatientPortalDashboard() {
                         )}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-semibold text-foreground truncate">
-                          {presc.file_name}
-                        </p>
-                        <p className="text-[11px] text-foreground/65 truncate">
-                          {presc.description || presc.file_type.toUpperCase()}
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-white border border-border text-primary">
+                            {presc.file_type}
+                          </span>
+                          <p className="text-xs font-bold text-foreground truncate">
+                            {presc.file_name}
+                          </p>
+                        </div>
+                        <p className="text-[11px] text-muted-foreground truncate mt-0.5">
+                          {presc.description || 'Clinical Exercise Prescription'}
                         </p>
                       </div>
                     </div>
@@ -316,7 +409,7 @@ export default async function PatientPortalDashboard() {
                       target="_blank"
                       rel="noopener noreferrer"
                       download={presc.file_name}
-                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-bold shrink-0 transition-colors"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-bold shrink-0 transition-colors"
                     >
                       <Download className="h-3.5 w-3.5" />
                       <span>Download</span>
@@ -327,42 +420,43 @@ export default async function PatientPortalDashboard() {
             )}
           </div>
 
-          {/* Automated WhatsApp Notifications Feed */}
-          <div className="bg-white rounded-lg p-6 sm:p-7 border border-border shadow-sm">
+          {/* Clean WhatsApp Care Timeline */}
+          <div className="bg-white rounded-2xl p-6 sm:p-7 border border-border shadow-sm">
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary mb-1">
               <MessageSquare className="h-4 w-4" />
-              <span>Automated WhatsApp Reminders</span>
+              <span>WhatsApp Care Notifications</span>
             </div>
-            <h2 className="text-lg font-semibold text-foreground mb-4">
-              Recent WhatsApp Updates
+            <h2 className="text-lg font-bold text-foreground mb-4">
+              Recent Confirmations &amp; Reminders
             </h2>
 
             {messageLogs.length === 0 ? (
-              <p className="text-xs text-foreground/65 py-4">
-                Your booking confirmations and 24h / 2h WhatsApp reminders will be logged here.
+              <p className="text-xs text-muted-foreground py-4">
+                Your booking confirmations and 24h / 2h WhatsApp reminders will appear here.
               </p>
             ) : (
               <div className="space-y-3">
                 {messageLogs.slice(0, 5).map((msg) => (
                   <div
                     key={msg.id}
-                    className="p-3.5 rounded-lg bg-muted/50 border border-border text-xs space-y-1"
+                    className="p-3.5 rounded-xl bg-[#F0FDF4]/60 border border-emerald-200/80 text-xs space-y-1.5"
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-bold uppercase tracking-wider text-[10px] text-primary">
-                        {msg.trigger_type.replace(/_/g, ' ')}
+                      <span className="font-bold text-emerald-950 flex items-center gap-1.5">
+                        <Sparkles className="h-3.5 w-3.5 text-emerald-600" />
+                        {formatTriggerLabel(msg.trigger_type)}
                       </span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-secondary text-[#006D75]">
-                        {msg.status}
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-white border border-emerald-200 text-emerald-800">
+                        {msg.status === 'queued' ? 'Scheduled' : msg.status}
                       </span>
                     </div>
                     <p className="text-muted-foreground font-medium">
                       {msg.template_variables?.clinic || 'The Physio Lab'}
                       {msg.template_variables?.date ? ` • ${msg.template_variables.date}` : ''}
                     </p>
-                    <p className="text-[11px] text-foreground/55 flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      <span>Scheduled: {formatDateTimeIST(msg.scheduled_for)}</span>
+                    <p className="text-[11px] font-mono text-muted-foreground flex items-center gap-1">
+                      <Clock className="h-3 w-3 text-emerald-700" />
+                      <span>{formatDateTimeIST(msg.scheduled_for)}</span>
                     </p>
                   </div>
                 ))}

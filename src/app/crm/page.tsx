@@ -7,9 +7,13 @@ import {
   Stethoscope,
   Users,
   Clock,
-  User,
   Phone,
-  ShieldCheck,
+  CalendarPlus,
+  UserPlus,
+  ArrowRight,
+  CheckCircle2,
+  AlertCircle,
+  Building2,
 } from 'lucide-react';
 import { getCrmSession } from '@/lib/auth/session';
 import { repositories } from '@/lib/repositories';
@@ -25,7 +29,7 @@ export default async function CrmDashboardPage() {
 
   const isPhysio = session.role === 'physio';
 
-  const [allPatients, schedule, consultations, messageLogs] = await Promise.all([
+  const [allPatients, schedule, consultations, messageLogs, physios] = await Promise.all([
     repositories.patients.searchPatients('', 50).catch(() => []),
     repositories.appointments
       .listSchedule(isPhysio ? { physioId: session.profileId } : undefined)
@@ -35,10 +39,10 @@ export default async function CrmDashboardPage() {
       .catch(() => []),
     isPhysio
       ? Promise.resolve([])
-      : repositories.messages.listMessageLogs(undefined, 15).catch(() => []),
+      : repositories.messages.listMessageLogs(undefined, 20).catch(() => []),
+    repositories.profiles.listActivePhysios().catch(() => []),
   ]);
 
-  // For physio role, scope patient list strictly to patients assigned to this physio
   const assignedPatientIds = new Set([
     ...schedule.map((a) => a.patient_id),
     ...consultations.map((c) => c.patient_id),
@@ -47,67 +51,61 @@ export default async function CrmDashboardPage() {
     ? allPatients.filter((p) => assignedPatientIds.has(p.id))
     : allPatients;
 
-  const scheduledCount = schedule.filter((a) => a.status === 'scheduled').length;
-  const completedCount = schedule.filter((a) => a.status === 'completed').length;
+  const scheduledAppointments = schedule.filter((a) => a.status === 'scheduled');
+  const completedAppointments = schedule.filter((a) => a.status === 'completed');
+  const unassignedCount = scheduledAppointments.filter((a) => !a.physio_id).length;
 
   const stats = isPhysio
     ? [
         {
-          title: 'My Scheduled Visits',
-          value: scheduledCount,
-          description: `${completedCount} completed sessions`,
+          title: 'Active Scheduled Visits',
+          value: scheduledAppointments.length,
+          badge: `${completedAppointments.length} Completed`,
           icon: Calendar,
-          color: 'text-primary',
           href: '/crm/schedule',
         },
         {
-          title: 'My Consultations & Rx',
+          title: 'Clinical Consultations & Rx',
           value: consultations.length,
-          description: 'Clinical notes & prescriptions',
+          badge: 'SOAP Charts & PDFs',
           icon: Stethoscope,
-          color: 'text-emerald-600',
           href: '/crm/consultations',
         },
         {
           title: 'My Assigned Patients',
           value: patients.length,
-          description: 'Patients under your care',
+          badge: 'Longitudinal Care',
           icon: Users,
-          color: 'text-sky-600',
           href: '/crm/patients',
         },
       ]
     : [
         {
-          title: 'Scheduled Visits',
-          value: scheduledCount,
-          description: `${completedCount} completed sessions`,
+          title: 'Scheduled Sessions',
+          value: scheduledAppointments.length,
+          badge: `${completedAppointments.length} Completed`,
           icon: Calendar,
-          color: 'text-primary',
           href: '/crm/schedule',
         },
         {
-          title: 'Total Patients',
+          title: 'Registered Patients',
           value: patients.length,
-          description: 'Registered patient profiles',
+          badge: 'Active Directory',
           icon: Users,
-          color: 'text-sky-600',
           href: '/crm/patients',
         },
         {
-          title: 'Consultations & Rx',
+          title: 'Consultations & Prescriptions',
           value: consultations.length,
-          description: 'Clinical notes & prescriptions',
+          badge: 'Clinical Records',
           icon: Stethoscope,
-          color: 'text-emerald-600',
           href: '/crm/consultations',
         },
         {
-          title: 'WhatsApp Messages',
+          title: 'WhatsApp Lifecycle Queue',
           value: messageLogs.length,
-          description: 'Confirmations & 24h/2h reminders',
+          badge: '24h & 2h Alerts',
           icon: MessageSquare,
-          color: 'text-amber-600',
           href: '/crm/messages',
         },
       ];
@@ -115,45 +113,99 @@ export default async function CrmDashboardPage() {
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
       case 'completed':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return 'bg-emerald-50 text-emerald-800 border-emerald-200';
       case 'no_show':
-        return 'bg-red-100 text-red-800 border-red-200';
+        return 'bg-amber-50 text-amber-800 border-amber-200';
       case 'cancelled':
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-red-50 text-red-700 border-red-200';
       default:
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+        return 'bg-secondary text-secondary-foreground border-primary/20';
     }
   };
 
   return (
-    <div className="flex-1 space-y-6">
-      {/* Header matching physio-lab.lovable.app */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-primary">
+    <div className="space-y-6">
+      {/* ====================================================================
+          1. CLINICAL COCKPIT HEADER & QUICK ACTION BAR
+      ==================================================================== */}
+      <div className="bg-white rounded-2xl p-6 sm:p-7 border border-border shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+        <div className="space-y-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-primary bg-secondary px-2.5 py-0.5 rounded-md">
+              <Building2 className="h-3.5 w-3.5" />
+              <span>The Physio Lab — Barewal Awana</span>
+            </span>
+            <span className="text-xs font-mono text-muted-foreground">
+              • {formatDateIST(new Date())}
+            </span>
+          </div>
+
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground pt-1">
             Welcome, {session.fullName}
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-xs sm:text-sm text-muted-foreground">
             {isPhysio
-              ? 'Viewing your personal clinical schedule, consultations, and assigned patients.'
+              ? 'Doctor Workspace • Manage your daily patient schedule, record SOAP clinical notes, and upload exercise prescriptions.'
               : session.role === 'staff'
-              ? 'Reception Desk — Manage clinic bookings, patient profiles, and WhatsApp communication.'
-              : 'Admin Overview — Full multi-clinic schedule, patients, consultations, and system settings.'}
+              ? 'Front Desk Cockpit • Coordinate multi-physio scheduling, patient check-ins, and automated WhatsApp lifecycle notifications.'
+              : 'Multi-Clinic Command Centre • Full clinical, scheduling, and administrative oversight across The Physio Lab.'}
           </p>
         </div>
-        <div className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground self-start">
-          <ShieldCheck className="h-3.5 w-3.5 text-primary" />
-          <span>
-            RBAC Scope:{' '}
-            <strong className="text-foreground uppercase">{session.role}</strong>
-            {isPhysio ? ' (Assigned Records Only)' : session.role === 'staff' ? ' (No Admin Settings)' : ' (Full Control)'}
-          </span>
+
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+          {!isPhysio && (
+            <>
+              <Link
+                href="/crm/schedule?book=1"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-bold shadow-sm transition-colors"
+              >
+                <CalendarPlus className="h-4 w-4" />
+                <span>+ New Appointment</span>
+              </Link>
+              <Link
+                href="/crm/patients?new=1"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-secondary hover:bg-accent text-secondary-foreground text-xs font-bold border border-primary/15 transition-colors"
+              >
+                <UserPlus className="h-4 w-4 text-primary" />
+                <span>+ Register Patient</span>
+              </Link>
+            </>
+          )}
+          <Link
+            href="/crm/consultations"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-muted/70 hover:bg-muted text-foreground text-xs font-bold border border-border transition-colors"
+          >
+            <Stethoscope className="h-4 w-4 text-primary" />
+            <span>Consultations &amp; Rx</span>
+          </Link>
         </div>
       </div>
 
-      {/* KPI Stat Cards */}
+      {/* Unassigned Triage Banner (if any patient self-booked with "Any Specialist") */}
+      {!isPhysio && unassignedCount > 0 && (
+        <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2.5 text-amber-900 font-semibold">
+            <AlertCircle className="h-4 w-4 text-amber-600 shrink-0" />
+            <span>
+              <strong>{unassignedCount} upcoming appointment(s)</strong> are currently in the
+              Clinic Triage Queue awaiting specialist assignment.
+            </span>
+          </div>
+          <Link
+            href="/crm/schedule"
+            className="inline-flex items-center gap-1 font-bold text-amber-900 hover:underline shrink-0"
+          >
+            <span>Open Schedule Grid</span>
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+      )}
+
+      {/* ====================================================================
+          2. KPI METRICS STRIP
+      ==================================================================== */}
       <div
-        className={`grid gap-4 md:grid-cols-2 ${
+        className={`grid gap-4 sm:grid-cols-2 ${
           isPhysio ? 'lg:grid-cols-3' : 'lg:grid-cols-4'
         }`}
       >
@@ -163,163 +215,234 @@ export default async function CrmDashboardPage() {
             <Link
               key={item.title}
               href={item.href}
-              className="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-lg transition-shadow block"
+              className="group rounded-2xl border border-border bg-white p-5 shadow-sm hover:shadow-md hover:border-primary/40 transition-all flex flex-col justify-between space-y-4"
             >
-              <div className="flex flex-row items-center justify-between space-y-0 p-6 pb-2">
-                <h3 className="text-sm font-medium tracking-tight">{item.title}</h3>
-                <Icon className={`h-4 w-4 ${item.color}`} />
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  {item.title}
+                </span>
+                <div className="h-9 w-9 rounded-xl bg-secondary text-primary group-hover:bg-primary group-hover:text-white transition-colors flex items-center justify-center">
+                  <Icon className="h-4 w-4" />
+                </div>
               </div>
-              <div className="p-6 pt-0">
-                <div className="text-2xl font-bold">{item.value}</div>
-                <p className="text-xs text-muted-foreground mt-0.5">{item.description}</p>
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-3xl font-bold font-mono text-foreground">{item.value}</span>
+                <span className="text-[11px] font-semibold text-primary bg-secondary/70 px-2.5 py-0.5 rounded-full">
+                  {item.badge}
+                </span>
               </div>
             </Link>
           );
         })}
       </div>
 
-      {/* 2-Column Main Content */}
-      <div className="grid gap-6 md:grid-cols-2 items-start">
-        {/* Left Card: Upcoming Appointments */}
-        <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-          <div className="flex flex-col space-y-1.5 p-6">
-            <div className="flex items-center justify-between">
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">
-                {isPhysio ? 'My Assigned Appointments' : 'Upcoming Appointments'}
-              </h3>
-              <Link
-                href="/crm/schedule"
-                className="text-sm text-primary hover:underline font-medium"
-              >
-                View Calendar
-              </Link>
+      {/* ====================================================================
+          3. LIVE PATIENT FLOW QUEUE + SPECIALIST ROSTER & PATIENT DIRECTORY
+      ==================================================================== */}
+      <div className="grid gap-6 lg:grid-cols-12 items-start">
+        {/* Left 7 Cols: Live Patient Appointment Queue */}
+        <div className="lg:col-span-7 bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-border flex items-center justify-between gap-4">
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-primary">
+                Live Operational Queue
+              </span>
+              <h2 className="text-xl font-bold text-foreground">
+                {isPhysio ? 'My Patient Queue' : 'Upcoming & Recent Sessions'}
+              </h2>
             </div>
-            <p className="text-sm text-muted-foreground">
-              {isPhysio
-                ? `Appointments assigned to ${session.fullName}`
-                : 'View and manage scheduled patient sessions'}
-            </p>
+            <Link
+              href="/crm/schedule"
+              className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
+            >
+              <span>Full Multi-Physio Calendar</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
-          <div className="p-6 pt-0">
+
+          <div className="divide-y divide-border/70">
             {schedule.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                No appointments scheduled
+              <div className="text-center py-12 text-muted-foreground text-sm">
+                No appointments scheduled yet.
               </div>
             ) : (
-              <div className="space-y-4">
-                {schedule.slice(0, 5).map((appt) => (
-                  <div key={appt.id} className="border rounded-lg p-4 space-y-2">
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <User className="h-4 w-4 text-muted-foreground" />
+              schedule.slice(0, 6).map((appt) => {
+                const initials = (appt.patient?.full_name || 'PT')
+                  .split(' ')
+                  .map((n) => n[0])
+                  .join('')
+                  .slice(0, 2);
+
+                return (
+                  <div
+                    key={appt.id}
+                    className="p-5 hover:bg-muted/30 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                  >
+                    <div className="flex items-start gap-3.5 min-w-0">
+                      <div className="h-10 w-10 rounded-xl bg-secondary text-primary font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
+                        {initials}
+                      </div>
+
+                      <div className="space-y-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <Link
                             href={`/crm/patients/${appt.patient_id}`}
-                            className="font-medium hover:text-primary"
+                            className="text-sm font-bold text-foreground hover:text-primary truncate"
                           >
                             {appt.patient?.full_name || 'Patient'}
                           </Link>
+                          <span
+                            className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase ${getStatusBadgeClass(
+                              appt.status
+                            )}`}
+                          >
+                            {appt.status.replace('_', ' ')}
+                          </span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm text-muted-foreground">
+
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
+                          <span className="font-mono font-semibold text-foreground inline-flex items-center gap-1">
+                            <Clock className="h-3.5 w-3.5 text-primary" />
                             {formatDateIST(appt.start_time)} • {formatTimeIST(appt.start_time)} (
                             {appt.manual_duration_mins}m)
                           </span>
+                          <span className="text-primary font-semibold">
+                            • {appt.physio?.full_name || 'Unassigned Triage'}
+                          </span>
                         </div>
-                        {appt.physio?.full_name && (
-                          <div className="flex items-center gap-2">
-                            <Stethoscope className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm text-muted-foreground">
-                              {appt.physio.full_name}
-                            </span>
-                          </div>
+
+                        {appt.chief_complaint && (
+                          <p className="text-xs text-muted-foreground line-clamp-1">
+                            <strong className="text-foreground/80">Chief Complaint:</strong>{' '}
+                            {appt.chief_complaint}
+                          </p>
                         )}
                       </div>
-                      <span
-                        className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold capitalize ${getStatusBadgeClass(
-                          appt.status
-                        )}`}
-                      >
-                        {appt.status.replace('_', ' ')}
-                      </span>
                     </div>
 
-                    {appt.chief_complaint && (
-                      <div className="text-sm text-muted-foreground border-t pt-2">
-                        <strong className="text-foreground font-medium">Notes:</strong>{' '}
-                        {appt.chief_complaint}
-                      </div>
-                    )}
-
-                    <div className="pt-2 flex items-center gap-2">
+                    <div className="flex items-center gap-2 shrink-0">
                       <Link
                         href={`/crm/consultations?appointmentId=${appt.id}`}
-                        className="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-1.5 text-xs font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+                        className="inline-flex items-center gap-1.5 rounded-xl bg-primary hover:bg-primary/90 text-white px-3.5 py-2 text-xs font-semibold shadow-sm transition-colors"
                       >
-                        {isPhysio ? 'Add Consultation Notes & Rx' : 'Open Consultation'}
+                        <Stethoscope className="h-3.5 w-3.5" />
+                        <span>{appt.status === 'completed' ? 'View Chart' : 'Open Chart'}</span>
                       </Link>
                     </div>
                   </div>
-                ))}
-              </div>
+                );
+              })
             )}
           </div>
         </div>
 
-        {/* Right Card: Patients */}
-        <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-          <div className="flex flex-col space-y-1.5 p-6">
+        {/* Right 5 Cols: Specialist Roster & Quick Patient Directory */}
+        <div className="lg:col-span-5 space-y-6">
+          {/* Active Physiotherapist Floor Roster */}
+          {!isPhysio && (
+            <div className="bg-white rounded-2xl border border-border shadow-sm p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-primary">
+                    Clinical Floor Roster
+                  </span>
+                  <h3 className="text-lg font-bold text-foreground">
+                    Active Specialists ({physios.length})
+                  </h3>
+                </div>
+                <Link
+                  href="/crm/schedule"
+                  className="text-xs font-bold text-primary hover:underline"
+                >
+                  Resource View →
+                </Link>
+              </div>
+
+              <div className="space-y-2.5">
+                {physios.map((doc) => {
+                  const docCount = scheduledAppointments.filter(
+                    (a) => a.physio_id === doc.id
+                  ).length;
+                  return (
+                    <div
+                      key={doc.id}
+                      className="p-3 rounded-xl bg-muted/40 border border-border flex items-center justify-between gap-3"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span
+                          className="h-3 w-3 rounded-full shrink-0"
+                          style={{ backgroundColor: doc.calendar_color || '#00858E' }}
+                        />
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold text-foreground truncate">
+                            {doc.full_name}
+                          </p>
+                          <p className="text-[11px] text-muted-foreground truncate">
+                            {doc.specialization || 'Consultant Physiotherapist'}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="font-mono text-xs font-bold px-2.5 py-1 rounded-lg bg-white border border-border text-primary shrink-0">
+                        {docCount} Active
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Quick Patient Lookup Card */}
+          <div className="bg-white rounded-2xl border border-border shadow-sm p-6 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">
-                {isPhysio ? 'My Assigned Patients' : 'Recent Patients'}
-              </h3>
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-primary">
+                  Patient Records
+                </span>
+                <h3 className="text-lg font-bold text-foreground">
+                  {isPhysio ? 'My Assigned Patients' : 'Recent Patient Profiles'}
+                </h3>
+              </div>
               <Link
                 href="/crm/patients"
-                className="text-sm text-primary hover:underline font-medium"
+                className="text-xs font-bold text-primary hover:underline"
               >
-                All Patients
+                Directory ({patients.length}) →
               </Link>
             </div>
-            <p className="text-sm text-muted-foreground">
-              {isPhysio
-                ? 'View clinical history and prescriptions for your patients'
-                : 'Quickly book visits or view patient clinical history'}
-            </p>
-          </div>
-          <div className="p-6 pt-0">
-            <div className="space-y-4">
+
+            <div className="space-y-2.5">
               {patients.slice(0, 5).map((patient) => (
                 <div
                   key={patient.id}
-                  className="border rounded-lg p-4 flex items-center justify-between gap-4"
+                  className="p-3.5 rounded-xl bg-muted/40 border border-border flex items-center justify-between gap-3"
                 >
-                  <div className="space-y-1 min-w-0">
+                  <div className="min-w-0">
                     <Link
                       href={`/crm/patients/${patient.id}`}
-                      className="font-medium text-primary hover:underline block truncate"
+                      className="text-xs sm:text-sm font-bold text-foreground hover:text-primary block truncate"
                     >
                       {patient.full_name}
                     </Link>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Phone className="h-3.5 w-3.5" />
+                    <div className="flex items-center gap-1.5 text-[11px] font-mono text-muted-foreground mt-0.5">
+                      <Phone className="h-3 w-3 text-primary" />
                       <span>{formatPhoneDisplay(patient.phone)}</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-1.5 shrink-0">
                     {!isPhysio && (
                       <Link
                         href={`/crm/schedule?book=1&patientId=${patient.id}`}
-                        className="inline-flex items-center justify-center rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                        className="px-2.5 py-1.5 rounded-lg bg-primary text-white text-[11px] font-semibold hover:bg-primary/90 transition-colors"
                       >
-                        Book Visit
+                        Book
                       </Link>
                     )}
                     <Link
                       href={`/crm/patients/${patient.id}`}
-                      className="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-1.5 text-xs font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+                      className="px-2.5 py-1.5 rounded-lg bg-white border border-border text-foreground text-[11px] font-semibold hover:bg-secondary transition-colors"
                     >
-                      Clinical History
+                      History
                     </Link>
                   </div>
                 </div>
