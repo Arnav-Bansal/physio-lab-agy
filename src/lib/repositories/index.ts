@@ -515,7 +515,7 @@ class SupabaseConsultationRepository implements IConsultationRepository {
     return (data as ConsultationRecord) ?? null;
   }
 
-  async listConsultations(clinicId?: string) {
+  async listConsultations(clinicId?: string, physioId?: string) {
     const supabase = createSupabaseAdminClient();
     let query = supabase
       .from('consultations')
@@ -531,6 +531,7 @@ class SupabaseConsultationRepository implements IConsultationRepository {
       .order('created_at', { ascending: false });
 
     if (clinicId) query = query.eq('clinic_id', clinicId);
+    if (physioId) query = query.eq('physio_id', physioId);
 
     const { data, error } = await query;
     if (error) throw new Error(`Failed to list consultations: ${error.message}`);

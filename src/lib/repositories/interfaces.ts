@@ -120,7 +120,7 @@ export interface IAppointmentRepository {
 export interface IConsultationRepository {
   openOrCreateFromAppointment(appointmentId: string, actorId?: string | null): Promise<ConsultationRecord>;
   getConsultationById(id: string): Promise<ConsultationRecord | null>;
-  listConsultations(clinicId?: string): Promise<(ConsultationRecord & {
+  listConsultations(clinicId?: string, physioId?: string): Promise<(ConsultationRecord & {
     patient?: Pick<PatientRecord, 'id' | 'full_name' | 'phone'> | null;
     clinic?: Pick<ClinicRecord, 'id' | 'name'> | null;
     physio?: Pick<ProfileRecord, 'id' | 'full_name' | 'specialization'> | null;
