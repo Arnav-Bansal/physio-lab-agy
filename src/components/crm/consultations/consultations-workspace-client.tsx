@@ -202,14 +202,14 @@ export function ConsultationsWorkspaceClient({
   return (
     <div className="space-y-6">
       {toast && (
-        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 flex items-center gap-2.5 text-xs sm:text-sm font-bold text-emerald-800">
+        <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-300 flex items-center gap-2.5 text-xs sm:text-sm font-bold text-emerald-800">
           <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
           <span>{toast}</span>
         </div>
       )}
 
       {error && (
-        <div className="p-4 rounded-2xl bg-red-50 border border-red-200 flex items-center gap-2.5 text-xs sm:text-sm font-bold text-red-700">
+        <div className="p-4 rounded-lg bg-red-50 border border-red-200 flex items-center gap-2.5 text-xs sm:text-sm font-bold text-red-700">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{error}</span>
         </div>
@@ -217,8 +217,8 @@ export function ConsultationsWorkspaceClient({
 
       {/* Quick Bar: Convert Unopened Scheduled Appointments into Consultations */}
       {scheduledAppointments.length > 0 && (
-        <div className="bg-white rounded-3xl p-5 border border-[#D6CFC2] shadow-sm space-y-3">
-          <p className="text-xs font-extrabold uppercase tracking-wider text-[#00858E]">
+        <div className="bg-white rounded-lg p-5 border border-border shadow-sm space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-wider text-primary">
             Convert Scheduled Appointments to Consultations ({scheduledAppointments.length})
           </p>
           <div className="flex flex-wrap gap-2.5">
@@ -228,7 +228,7 @@ export function ConsultationsWorkspaceClient({
                 type="button"
                 disabled={convertingApptId === appt.id}
                 onClick={() => handleConvertAppointment(appt.id)}
-                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#F5F2EB] hover:bg-[#00858E] text-[#141413] hover:text-white border border-[#D6CFC2] text-xs font-bold transition-colors"
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-muted/50 hover:bg-primary text-foreground hover:text-white border border-border text-xs font-bold transition-colors"
               >
                 {convertingApptId === appt.id ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -248,7 +248,7 @@ export function ConsultationsWorkspaceClient({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left 4 Cols: All Consultations List */}
         <div className="lg:col-span-4 space-y-3">
-          <h2 className="text-sm font-extrabold uppercase tracking-wider text-[#141413]/70">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
             All Consultations ({consultations.length})
           </h2>
 
@@ -261,19 +261,19 @@ export function ConsultationsWorkspaceClient({
                   type="button"
                   onClick={() => selectConsultation(c)}
                   className={cn(
-                    'w-full text-left p-4 rounded-2xl border transition-all space-y-1.5',
+                    'w-full text-left p-4 rounded-lg border transition-all space-y-1.5',
                     isSelected
-                      ? 'bg-white border-2 border-[#00858E] shadow-md'
-                      : 'bg-white/80 border-[#D6CFC2] hover:border-[#00858E]/50'
+                      ? 'bg-white border-2 border-primary shadow-md'
+                      : 'bg-white/80 border-border hover:border-primary/50'
                   )}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm font-extrabold text-[#141413]">
+                    <span className="text-sm font-semibold text-foreground">
                       {c.patient?.full_name || 'Patient'}
                     </span>
                     <span
                       className={cn(
-                        'px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase',
+                        'px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase',
                         c.status === 'completed'
                           ? 'bg-emerald-100 text-emerald-800'
                           : 'bg-amber-100 text-amber-800'
@@ -282,13 +282,13 @@ export function ConsultationsWorkspaceClient({
                       {c.status.replace('_', ' ')}
                     </span>
                   </div>
-                  <p className="text-xs font-semibold text-[#00858E]">
+                  <p className="text-xs font-semibold text-primary">
                     {c.physio?.full_name || 'Clinic Specialist'}
                   </p>
-                  <p className="text-[11px] text-[#141413]/65 line-clamp-1">
+                  <p className="text-[11px] text-foreground/65 line-clamp-1">
                     {c.diagnosis || c.chief_complaint || 'Clinical evaluation in progress'}
                   </p>
-                  <div className="flex items-center justify-between text-[10px] text-[#141413]/55 pt-1">
+                  <div className="flex items-center justify-between text-[10px] text-foreground/55 pt-1">
                     <span>{formatDateIST(c.created_at)}</span>
                     <span>{(c.prescriptions || []).length} Prescription(s)</span>
                   </div>
@@ -301,24 +301,24 @@ export function ConsultationsWorkspaceClient({
         {/* Right 8 Cols: Active Consultation Editor + PDF/Image Prescription Uploader */}
         <div className="lg:col-span-8">
           {!activeConsultation ? (
-            <div className="bg-white rounded-3xl p-12 text-center border border-[#D6CFC2]">
-              <Stethoscope className="h-10 w-10 text-[#00858E] mx-auto mb-3" />
-              <p className="text-base font-extrabold text-[#141413]">
+            <div className="bg-white rounded-lg p-12 text-center border border-border">
+              <Stethoscope className="h-10 w-10 text-primary mx-auto mb-3" />
+              <p className="text-base font-semibold text-foreground">
                 Select a consultation or convert a scheduled appointment above
               </p>
             </div>
           ) : (
-            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#D6CFC2] shadow-sm space-y-6">
+            <div className="bg-white rounded-lg p-6 sm:p-8 border border-border shadow-sm space-y-6">
               {/* Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E8E2D7] pb-4">
                 <div>
                   <div className="flex items-center gap-2.5">
-                    <span className="text-xs font-extrabold uppercase tracking-wider text-[#00858E]">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-primary">
                       Clinical Consultation Sheet
                     </span>
                     <span
                       className={cn(
-                        'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase',
+                        'px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase',
                         activeConsultation.status === 'completed'
                           ? 'bg-emerald-100 text-emerald-800'
                           : 'bg-amber-100 text-amber-800'
@@ -327,10 +327,10 @@ export function ConsultationsWorkspaceClient({
                       {activeConsultation.status.replace('_', ' ')}
                     </span>
                   </div>
-                  <h2 className="text-2xl font-extrabold text-[#141413] mt-1">
+                  <h2 className="text-2xl font-semibold text-foreground mt-1">
                     {activeConsultation.patient?.full_name}
                   </h2>
-                  <p className="text-xs text-[#141413]/70">
+                  <p className="text-xs text-muted-foreground">
                     Attending: <strong>{activeConsultation.physio?.full_name || 'Clinic Specialist'}</strong>{' '}
                     • {activeConsultation.clinic?.name || 'The Physio Lab — Barewal Awana'}
                   </p>
@@ -338,9 +338,9 @@ export function ConsultationsWorkspaceClient({
 
                 <Link
                   href={`/crm/patients/${activeConsultation.patient_id}`}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#F5F2EB] border border-[#D6CFC2] text-xs font-bold text-[#141413] hover:border-[#00858E]"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-muted/50 border border-border text-xs font-bold text-foreground hover:border-primary"
                 >
-                  <User className="h-3.5 w-3.5 text-[#00858E]" />
+                  <User className="h-3.5 w-3.5 text-primary" />
                   <span>View Patient History</span>
                 </Link>
               </div>
@@ -357,7 +357,7 @@ export function ConsultationsWorkspaceClient({
                       value={chiefComplaint}
                       onChange={(e) => setChiefComplaint(e.target.value)}
                       placeholder="Primary symptoms & pain area..."
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/50 font-semibold"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50 font-semibold"
                     />
                   </div>
                   <div>
@@ -369,7 +369,7 @@ export function ConsultationsWorkspaceClient({
                       value={diagnosis}
                       onChange={(e) => setDiagnosis(e.target.value)}
                       placeholder="e.g., Grade-II Right Knee ACL Sprain"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/50 font-semibold"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50 font-semibold"
                     />
                   </div>
                 </div>
@@ -383,7 +383,7 @@ export function ConsultationsWorkspaceClient({
                     value={clinicalNotes}
                     onChange={(e) => setClinicalNotes(e.target.value)}
                     placeholder="Range of motion, special tests, Desmotec force metrics, manual therapy performed..."
-                    className="w-full p-3.5 rounded-2xl border border-[#D6CFC2] bg-[#F5F2EB]/50"
+                    className="w-full p-3.5 rounded-lg border border-border bg-muted/50"
                   />
                 </div>
 
@@ -396,7 +396,7 @@ export function ConsultationsWorkspaceClient({
                     value={treatmentPlan}
                     onChange={(e) => setTreatmentPlan(e.target.value)}
                     placeholder="1. Eccentric squats 3x10&#10;2. Resistance band exercises..."
-                    className="w-full p-3.5 rounded-2xl border border-[#D6CFC2] bg-[#F5F2EB]/50"
+                    className="w-full p-3.5 rounded-lg border border-border bg-muted/50"
                   />
                 </div>
 
@@ -408,28 +408,28 @@ export function ConsultationsWorkspaceClient({
                     type="date"
                     value={followUpDate}
                     onChange={(e) => setFollowUpDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/50 font-semibold"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50 font-semibold"
                   />
                 </div>
               </div>
 
               {/* Dual PDF & Image Prescription Uploader */}
-              <div className="p-5 rounded-2xl bg-[#F5F2EB]/80 border-2 border-dashed border-[#00858E]/40 space-y-4">
+              <div className="p-5 rounded-lg bg-muted/50 border-2 border-dashed border-primary/40 space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#00858E]">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
                       Private Supabase Storage Bucket (prescriptions/)
                     </span>
-                    <h3 className="text-base font-extrabold text-[#141413]">
+                    <h3 className="text-base font-semibold text-foreground">
                       Upload Prescription (Both PDF &amp; Image Supported)
                     </h3>
-                    <p className="text-xs text-[#141413]/65">
+                    <p className="text-xs text-foreground/65">
                       Supports <code>.pdf</code> documents and <code>.jpg / .png / .webp</code>{' '}
                       exercise chart photos (max 10 MB).
                     </p>
                   </div>
 
-                  <label className="cursor-pointer inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[#00858E] hover:bg-[#006D75] text-white text-xs font-extrabold shadow-sm shrink-0 transition-colors">
+                  <label className="cursor-pointer inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-semibold shadow-sm shrink-0 transition-colors">
                     {uploadingFile ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
@@ -451,32 +451,32 @@ export function ConsultationsWorkspaceClient({
                   value={rxDescription}
                   onChange={(e) => setRxDescription(e.target.value)}
                   placeholder="Optional prescription title/notes (e.g., Phase-2 Desmotec Rehab Chart)..."
-                  className="w-full px-3.5 py-2 rounded-xl border border-[#D6CFC2] bg-white text-xs"
+                  className="w-full px-3.5 py-2 rounded-xl border border-border bg-white text-xs"
                 />
 
                 {/* Attached Prescriptions List */}
                 {(activeConsultation.prescriptions || []).length > 0 && (
-                  <div className="space-y-2 pt-2 border-t border-[#D6CFC2]">
-                    <p className="text-[11px] font-extrabold uppercase text-[#141413]/65">
+                  <div className="space-y-2 pt-2 border-t border-border">
+                    <p className="text-[11px] font-semibold uppercase text-foreground/65">
                       Uploaded Prescriptions ({(activeConsultation.prescriptions || []).length})
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       {(activeConsultation.prescriptions || []).map((rx) => (
                         <div
                           key={rx.id}
-                          className="p-3 rounded-xl bg-white border border-[#D6CFC2] flex items-center justify-between gap-2"
+                          className="p-3 rounded-xl bg-white border border-border flex items-center justify-between gap-2"
                         >
                           <div className="flex items-center gap-2 min-w-0">
                             {rx.file_type === 'pdf' ? (
-                              <FileText className="h-4 w-4 text-[#00858E] shrink-0" />
+                              <FileText className="h-4 w-4 text-primary shrink-0" />
                             ) : (
-                              <ImageIcon className="h-4 w-4 text-[#00858E] shrink-0" />
+                              <ImageIcon className="h-4 w-4 text-primary shrink-0" />
                             )}
                             <div className="min-w-0">
-                              <p className="text-xs font-bold text-[#141413] truncate">
+                              <p className="text-xs font-bold text-foreground truncate">
                                 {rx.file_name}
                               </p>
-                              <p className="text-[10px] text-[#141413]/55">
+                              <p className="text-[10px] text-foreground/55">
                                 {rx.file_type.toUpperCase()} • {formatFileSize(rx.file_size_bytes)}
                               </p>
                             </div>
@@ -486,7 +486,7 @@ export function ConsultationsWorkspaceClient({
                             target="_blank"
                             rel="noopener noreferrer"
                             download={rx.file_name}
-                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#DCE8E6] text-[#006D75] text-[11px] font-bold shrink-0"
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-secondary text-[#006D75] text-[11px] font-bold shrink-0"
                           >
                             <Download className="h-3 w-3" />
                             <span>View</span>
@@ -504,7 +504,7 @@ export function ConsultationsWorkspaceClient({
                   type="button"
                   disabled={savingNotes}
                   onClick={() => handleSaveConsultation(false)}
-                  className="px-5 py-3 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB] hover:bg-[#E8E2D7] text-xs font-bold text-[#141413]"
+                  className="px-5 py-3 rounded-xl border border-border bg-muted/50 hover:bg-muted text-xs font-bold text-foreground"
                 >
                   Save Draft Notes
                 </button>
@@ -513,7 +513,7 @@ export function ConsultationsWorkspaceClient({
                   type="button"
                   disabled={savingNotes}
                   onClick={() => handleSaveConsultation(true)}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#00858E] hover:bg-[#006D75] text-white text-xs sm:text-sm font-extrabold shadow-md transition-colors"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs sm:text-sm font-semibold shadow-md transition-colors"
                 >
                   {savingNotes ? (
                     <Loader2 className="h-4 w-4 animate-spin" />

@@ -4,25 +4,39 @@
 
 @layer base {
   :root {
-    /* Warm Architectural Stone & Teal Clinical Palette */
-    --background: 42 29% 95%; /* #F5F2EB Warm Stone Linen */
-    --foreground: 60 3% 8%;   /* #141413 Deep Charcoal Acrylic */
+    /* Exact physio-lab.lovable.app Medical Teal & Airy Clinical Palette */
+    --background: 180 100% 99%;
+    --foreground: 180 15% 15%;
     --card: 0 0% 100%;
-    --card-foreground: 60 3% 8%;
-    --primary: 184 100% 28%;  /* #00858E Primary Brand Teal */
+    --card-foreground: 180 15% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 180 15% 15%;
+    --primary: 180 85% 25%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 39 24% 88%;  /* #E8E2D7 Textured Linen Stone */
-    --secondary-foreground: 60 3% 8%;
-    --muted: 170 21% 90%;     /* #DCE8E6 Frosted Sage Glass */
-    --muted-foreground: 195 16% 32%;
-    --accent: 184 100% 33%;   /* #009CA6 Vibrant Aqua */
-    --accent-foreground: 0 0% 100%;
+    --secondary: 180 45% 96%;
+    --secondary-foreground: 180 85% 25%;
+    --muted: 180 25% 96%;
+    --muted-foreground: 180 10% 50%;
+    --accent: 180 45% 94%;
+    --accent-foreground: 180 85% 25%;
     --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 38 18% 82%;
-    --input: 38 18% 82%;
-    --ring: 184 100% 28%;
-    --radius: 0.75rem;
+    --destructive-foreground: 0 0% 100%;
+    --border: 180 20% 88%;
+    --input: 180 20% 88%;
+    --ring: 180 85% 25%;
+    --radius: 0.5rem;
+    --sidebar-background: 180 60% 98%;
+    --sidebar-foreground: 180 15% 25%;
+    --sidebar-primary: 180 85% 25%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 180 35% 94%;
+    --sidebar-accent-foreground: 180 85% 25%;
+    --sidebar-border: 180 25% 85%;
+    --sidebar-ring: 180 85% 25%;
+    --medical-success: 142 76% 36%;
+    --medical-warning: 48 96% 53%;
+    --medical-info: 200 98% 39%;
+    --medical-light: 180 100% 98%;
   }
 }
 
@@ -30,22 +44,27 @@
   * {
     @apply border-border;
   }
+  html {
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-feature-settings: normal;
+    font-variation-settings: normal;
+  }
   body {
-    @apply bg-[#F5F2EB] text-[#141413] antialiased selection:bg-[#00858E]/20 selection:text-[#006D75];
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    @apply antialiased selection:bg-primary/15 selection:text-primary;
   }
 }
 
-/* Subtle linen stone texture effect inspired by The Physio Lab reception feature wall */
+/* Clean airy background replacing the old heavy beige grid */
 .bg-stone-linen {
-  background-color: #F5F2EB;
-  background-image: radial-gradient(rgba(0, 133, 142, 0.04) 1px, transparent 0),
-    linear-gradient(to right, rgba(214, 207, 194, 0.25) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(214, 207, 194, 0.25) 1px, transparent 1px);
-  background-size: 24px 24px, 64px 64px, 64px 64px;
+  background-color: hsl(var(--background));
 }
 
 .frosted-sage-panel {
-  background: rgba(220, 232, 230, 0.65);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(247, 252, 252, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }

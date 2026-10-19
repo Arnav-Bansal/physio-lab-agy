@@ -21,13 +21,13 @@ export default async function CrmAdminPage() {
   return (
     <div className="space-y-6">
       <div>
-        <span className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#00858E]">
+        <span className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
           System Administration
         </span>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#141413] mt-1">
+        <h1 className="text-2xl sm:text-3xl font-semibold text-foreground mt-1">
           Admin Control Center — Clinics, Physios &amp; Templates
         </h1>
-        <p className="text-sm text-[#141413]/70 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           Configure multi-branch clinics, onboard specialist physiotherapists and reception staff,
           and customize WhatsApp notification templates.
         </p>

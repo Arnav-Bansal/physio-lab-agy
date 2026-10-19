@@ -18,13 +18,13 @@ export default async function PatientBookAppointmentPage({
   return (
     <div className="space-y-6">
       <div>
-        <span className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#00858E]">
+        <span className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
           Self-Service Scheduling
         </span>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#141413] mt-1">
+        <h1 className="text-2xl sm:text-3xl font-semibold text-foreground mt-1">
           Book Your Physiotherapy Session
         </h1>
-        <p className="text-sm text-[#141413]/70 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           Select your preferred clinic branch, optional specialist physiotherapist, and real-time
           available time slot.
         </p>

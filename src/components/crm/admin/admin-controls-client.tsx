@@ -163,7 +163,7 @@ export function AdminControlsClient({
   return (
     <div className="space-y-6">
       {!isAdmin && (
-        <div className="p-4 rounded-2xl bg-amber-50 border border-amber-300 flex items-center gap-3 text-xs sm:text-sm font-bold text-amber-900">
+        <div className="p-4 rounded-lg bg-amber-50 border border-amber-300 flex items-center gap-3 text-xs sm:text-sm font-bold text-amber-900">
           <ShieldAlert className="h-5 w-5 text-amber-600 shrink-0" />
           <span>
             You are currently viewing Admin Controls in read-only mode as{' '}
@@ -174,28 +174,28 @@ export function AdminControlsClient({
       )}
 
       {toast && (
-        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 flex items-center gap-2 text-xs sm:text-sm font-bold text-emerald-800">
+        <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-300 flex items-center gap-2 text-xs sm:text-sm font-bold text-emerald-800">
           <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
           <span>{toast}</span>
         </div>
       )}
 
       {error && (
-        <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-xs sm:text-sm font-bold text-red-700">
+        <div className="p-4 rounded-lg bg-red-50 border border-red-200 text-xs sm:text-sm font-bold text-red-700">
           {error}
         </div>
       )}
 
       {/* Tab Selector */}
-      <div className="inline-flex items-center rounded-2xl bg-white p-1.5 border border-[#D6CFC2] shadow-sm">
+      <div className="inline-flex items-center rounded-lg bg-white p-1.5 border border-border shadow-sm">
         <button
           type="button"
           onClick={() => setActiveTab('clinics')}
           className={cn(
-            'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold flex items-center gap-2 transition-all',
+            'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all',
             activeTab === 'clinics'
-              ? 'bg-[#00858E] text-white shadow-sm'
-              : 'text-[#141413]/70 hover:text-[#141413]'
+              ? 'bg-primary text-white shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
           )}
         >
           <Building2 className="h-4 w-4" />
@@ -206,10 +206,10 @@ export function AdminControlsClient({
           type="button"
           onClick={() => setActiveTab('users')}
           className={cn(
-            'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold flex items-center gap-2 transition-all',
+            'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all',
             activeTab === 'users'
-              ? 'bg-[#00858E] text-white shadow-sm'
-              : 'text-[#141413]/70 hover:text-[#141413]'
+              ? 'bg-primary text-white shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
           )}
         >
           <Users className="h-4 w-4" />
@@ -220,10 +220,10 @@ export function AdminControlsClient({
           type="button"
           onClick={() => setActiveTab('templates')}
           className={cn(
-            'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold flex items-center gap-2 transition-all',
+            'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all',
             activeTab === 'templates'
-              ? 'bg-[#00858E] text-white shadow-sm'
-              : 'text-[#141413]/70 hover:text-[#141413]'
+              ? 'bg-primary text-white shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
           )}
         >
           <MessageSquare className="h-4 w-4" />
@@ -238,18 +238,18 @@ export function AdminControlsClient({
             {clinics.map((c) => (
               <div
                 key={c.id}
-                className="bg-white rounded-3xl p-6 border border-[#D6CFC2] shadow-sm space-y-2"
+                className="bg-white rounded-lg p-6 border border-border shadow-sm space-y-2"
               >
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-extrabold text-[#141413]">{c.name}</h3>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-800">
+                  <h3 className="text-lg font-semibold text-foreground">{c.name}</h3>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase bg-emerald-100 text-emerald-800">
                     Active Branch
                   </span>
                 </div>
-                <p className="text-xs text-[#141413]/75">
+                <p className="text-xs text-foreground/75">
                   {c.address}, {c.city}, {c.state} — {c.pincode}
                 </p>
-                <p className="text-xs font-bold text-[#00858E]">
+                <p className="text-xs font-bold text-primary">
                   Phone: {formatPhoneDisplay(c.phone)} • Default Slot: {c.default_slot_duration_mins}{' '}
                   mins
                 </p>
@@ -260,9 +260,9 @@ export function AdminControlsClient({
           <div className="lg:col-span-5">
             <form
               onSubmit={handleSaveClinic}
-              className="bg-white rounded-3xl p-6 border border-[#D6CFC2] shadow-sm space-y-4 text-xs sm:text-sm"
+              className="bg-white rounded-lg p-6 border border-border shadow-sm space-y-4 text-xs sm:text-sm"
             >
-              <h3 className="text-lg font-extrabold text-[#141413]">
+              <h3 className="text-lg font-semibold text-foreground">
                 + Add / Update Clinic Branch
               </h3>
               <div>
@@ -274,7 +274,7 @@ export function AdminControlsClient({
                   value={clinicName}
                   onChange={(e) => setClinicName(e.target.value)}
                   placeholder="e.g., The Physio Lab — Sarabha Nagar"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/60 font-semibold"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50 font-semibold"
                 />
               </div>
               <div>
@@ -286,7 +286,7 @@ export function AdminControlsClient({
                   value={clinicAddress}
                   onChange={(e) => setClinicAddress(e.target.value)}
                   placeholder="Sarabha Nagar Main Market, Ludhiana"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/60"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -298,7 +298,7 @@ export function AdminControlsClient({
                     disabled={!isAdmin}
                     value={clinicPhone}
                     onChange={(e) => setClinicPhone(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/60 font-semibold"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50 font-semibold"
                   />
                 </div>
                 <div>
@@ -310,14 +310,14 @@ export function AdminControlsClient({
                     disabled={!isAdmin}
                     value={slotDuration}
                     onChange={(e) => setSlotDuration(Number(e.target.value))}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/60 font-semibold"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50 font-semibold"
                   />
                 </div>
               </div>
               <button
                 type="submit"
                 disabled={!isAdmin || saving}
-                className="w-full inline-flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-[#00858E] text-white font-extrabold disabled:opacity-50"
+                className="w-full inline-flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-primary text-white font-semibold disabled:opacity-50"
               >
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
                 <span>Save Clinic Branch</span>
@@ -334,25 +334,25 @@ export function AdminControlsClient({
             {profiles.map((p) => (
               <div
                 key={p.id}
-                className="bg-white rounded-3xl p-5 border border-[#D6CFC2] shadow-sm flex items-center justify-between gap-4"
+                className="bg-white rounded-lg p-5 border border-border shadow-sm flex items-center justify-between gap-4"
               >
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-base font-extrabold text-[#141413]">
+                    <span className="text-base font-semibold text-foreground">
                       {p.full_name}
                     </span>
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-[#00858E] text-white">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase bg-primary text-white">
                       {p.role}
                     </span>
                   </div>
-                  <p className="text-xs font-semibold text-[#00858E]">
+                  <p className="text-xs font-semibold text-primary">
                     {p.specialization || 'Clinic Operations'}
                   </p>
-                  <p className="text-xs text-[#141413]/65">
+                  <p className="text-xs text-foreground/65">
                     {p.email} • {formatPhoneDisplay(p.phone)}
                   </p>
                 </div>
-                <Stethoscope className="h-6 w-6 text-[#00858E] shrink-0" />
+                <Stethoscope className="h-6 w-6 text-primary shrink-0" />
               </div>
             ))}
           </div>
@@ -360,9 +360,9 @@ export function AdminControlsClient({
           <div className="lg:col-span-5">
             <form
               onSubmit={handleSaveUserProfile}
-              className="bg-white rounded-3xl p-6 border border-[#D6CFC2] shadow-sm space-y-4 text-xs sm:text-sm"
+              className="bg-white rounded-lg p-6 border border-border shadow-sm space-y-4 text-xs sm:text-sm"
             >
-              <h3 className="text-lg font-extrabold text-[#141413]">
+              <h3 className="text-lg font-semibold text-foreground">
                 + Onboard Physio / Staff Member
               </h3>
               <div>
@@ -374,7 +374,7 @@ export function AdminControlsClient({
                   value={userFullName}
                   onChange={(e) => setUserFullName(e.target.value)}
                   placeholder="Dr. Simranjit Kaur, MPT"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/60 font-semibold"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50 font-semibold"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -387,7 +387,7 @@ export function AdminControlsClient({
                     value={userEmail}
                     onChange={(e) => setUserEmail(e.target.value)}
                     placeholder="doctor@thephysiolab.in"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/60"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50"
                   />
                 </div>
                 <div>
@@ -398,7 +398,7 @@ export function AdminControlsClient({
                     onChange={(e) =>
                       setUserRole(e.target.value as 'physio' | 'staff' | 'admin')
                     }
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/60 font-bold"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50 font-bold"
                   >
                     <option value="physio">Physio (Doctor)</option>
                     <option value="staff">Reception / Staff</option>
@@ -414,7 +414,7 @@ export function AdminControlsClient({
                   value={userPhone}
                   onChange={(e) => setUserPhone(e.target.value)}
                   placeholder="+91 98153-70609"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/60"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50"
                 />
               </div>
               <div>
@@ -427,13 +427,13 @@ export function AdminControlsClient({
                   value={userSpecialization}
                   onChange={(e) => setUserSpecialization(e.target.value)}
                   placeholder="Sports Injury Centre / Neuro Rehab / Ortho"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/60"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50"
                 />
               </div>
               <button
                 type="submit"
                 disabled={!isAdmin || saving}
-                className="w-full inline-flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-[#00858E] text-white font-extrabold disabled:opacity-50"
+                className="w-full inline-flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-primary text-white font-semibold disabled:opacity-50"
               >
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
                 <span>Save User Profile</span>
@@ -446,7 +446,7 @@ export function AdminControlsClient({
       {/* TAB 3: CONFIGURE WHATSAPP MESSAGE TEMPLATES */}
       {activeTab === 'templates' && (
         <div className="space-y-4">
-          <div className="bg-[#DCE8E6]/60 rounded-2xl p-4 border border-[#00858E]/25 text-xs font-semibold text-[#006D75]">
+          <div className="bg-secondary rounded-lg p-4 border border-primary/25 text-xs font-semibold text-[#006D75]">
             Supported Dynamic Variables: <code>{'{{name}}'}</code> (Patient Name),{' '}
             <code>{'{{date}}'}</code> (Appointment Date &amp; Time IST),{' '}
             <code>{'{{clinic}}'}</code> (Clinic Branch), and <code>{'{{physio}}'}</code> (Assigned
@@ -457,14 +457,14 @@ export function AdminControlsClient({
             {templates.map((tpl, idx) => (
               <div
                 key={tpl.id}
-                className="bg-white rounded-3xl p-6 border border-[#D6CFC2] shadow-sm space-y-4"
+                className="bg-white rounded-lg p-6 border border-border shadow-sm space-y-4"
               >
                 <div className="flex items-center justify-between gap-2">
                   <div>
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#00858E]">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
                       Trigger: {tpl.trigger_type}
                     </span>
-                    <h3 className="text-base font-extrabold text-[#141413]">{tpl.name}</h3>
+                    <h3 className="text-base font-semibold text-foreground">{tpl.name}</h3>
                   </div>
 
                   <label className="inline-flex items-center gap-2 text-xs font-bold">
@@ -477,14 +477,14 @@ export function AdminControlsClient({
                         next[idx] = { ...tpl, is_active: e.target.checked };
                         setTemplates(next);
                       }}
-                      className="rounded border-[#D6CFC2]"
+                      className="rounded border-border"
                     />
                     <span>Active</span>
                   </label>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold uppercase text-[#141413]/70 mb-1">
+                  <label className="block text-[11px] font-bold uppercase text-muted-foreground mb-1">
                     Meta Template Name
                   </label>
                   <input
@@ -496,12 +496,12 @@ export function AdminControlsClient({
                       next[idx] = { ...tpl, meta_template_name: e.target.value };
                       setTemplates(next);
                     }}
-                    className="w-full px-3 py-2 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/60 text-xs font-mono font-bold"
+                    className="w-full px-3 py-2 rounded-xl border border-border bg-muted/50 text-xs font-mono font-bold"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold uppercase text-[#141413]/70 mb-1">
+                  <label className="block text-[11px] font-bold uppercase text-muted-foreground mb-1">
                     Template Body (`{'{{name}}'}`, `{'{{date}}'}`, `{'{{clinic}}'}`, `{'{{physio}}'}`)
                   </label>
                   <textarea
@@ -513,7 +513,7 @@ export function AdminControlsClient({
                       next[idx] = { ...tpl, body_preview: e.target.value };
                       setTemplates(next);
                     }}
-                    className="w-full p-3 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/60 text-xs"
+                    className="w-full p-3 rounded-xl border border-border bg-muted/50 text-xs"
                   />
                 </div>
 
@@ -522,7 +522,7 @@ export function AdminControlsClient({
                     type="button"
                     disabled={!isAdmin || saving}
                     onClick={() => handleUpdateTemplate(tpl)}
-                    className="px-4 py-2 rounded-xl bg-[#00858E] text-white text-xs font-extrabold disabled:opacity-50"
+                    className="px-4 py-2 rounded-xl bg-primary text-white text-xs font-semibold disabled:opacity-50"
                   >
                     Save Template
                   </button>

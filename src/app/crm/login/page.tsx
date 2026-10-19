@@ -75,14 +75,14 @@ export default function CrmLoginPage() {
 
   return (
     <div className="min-h-screen bg-stone-linen flex flex-col">
-      <header className="border-b border-[#D6CFC2] bg-[#F5F2EB]/90 backdrop-blur-md">
+      <header className="border-b border-border bg-muted/50 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <Link href="/">
             <BrandLogo />
           </Link>
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#00858E] hover:underline"
+            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-primary hover:underline"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>Back to Public Website</span>
@@ -93,17 +93,17 @@ export default function CrmLoginPage() {
       <main className="flex-1 flex items-center justify-center p-4 sm:p-6">
         <form
           onSubmit={handleLogin}
-          className="max-w-xl w-full bg-white rounded-3xl p-7 sm:p-9 border border-[#D6CFC2] shadow-xl space-y-6"
+          className="max-w-xl w-full bg-white rounded-lg p-7 sm:p-9 border border-border shadow-xl space-y-6"
         >
           <div>
-            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#00858E]">
+            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary">
               <ShieldCheck className="h-4 w-4" />
               <span>Unified Web CRM Access</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#141413] mt-1">
+            <h1 className="text-2xl sm:text-3xl font-semibold text-foreground mt-1">
               Staff, Physio &amp; Admin Login
             </h1>
-            <p className="text-sm text-[#141413]/70 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               Select a role profile to sign in to The Physio Lab multi-clinic management dashboard.
             </p>
           </div>
@@ -123,23 +123,23 @@ export default function CrmLoginPage() {
                   key={item.id}
                   type="button"
                   onClick={() => setSelectedId(item.id)}
-                  className={`w-full text-left p-4 rounded-2xl border transition-all flex items-start gap-4 ${
+                  className={`w-full text-left p-4 rounded-lg border transition-all flex items-start gap-4 ${
                     isSelected
-                      ? 'border-2 border-[#00858E] bg-[#DCE8E6]/50 shadow-sm'
-                      : 'border-[#D6CFC2] bg-[#F5F2EB]/40 hover:border-[#00858E]/50'
+                      ? 'border-2 border-primary bg-secondary shadow-sm'
+                      : 'border-border bg-muted/50 hover:border-primary/50'
                   }`}
                 >
-                  <div className="h-11 w-11 rounded-xl bg-[#00858E] text-white flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="h-11 w-11 rounded-xl bg-primary text-white flex items-center justify-center shrink-0 mt-0.5">
                     <Icon className="h-5 w-5" />
                   </div>
                   <div className="space-y-0.5">
-                    <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#00858E]">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-primary">
                       {item.title}
                     </span>
-                    <p className="text-sm font-extrabold text-[#141413]">
+                    <p className="text-sm font-semibold text-foreground">
                       {item.name} ({item.email})
                     </p>
-                    <p className="text-xs text-[#141413]/70">{item.desc}</p>
+                    <p className="text-xs text-muted-foreground">{item.desc}</p>
                   </div>
                 </button>
               );
@@ -149,7 +149,7 @@ export default function CrmLoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full inline-flex items-center justify-center gap-2 py-4 px-6 rounded-xl bg-[#00858E] hover:bg-[#006D75] text-white font-extrabold text-sm shadow-lg shadow-[#00858E]/20 transition-all"
+            className="w-full inline-flex items-center justify-center gap-2 py-4 px-6 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-sm shadow-lg shadow-[#00858E]/20 transition-all"
           >
             {loading ? (
               <>

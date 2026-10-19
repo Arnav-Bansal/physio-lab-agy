@@ -206,7 +206,7 @@ export function ScheduleEngineClient({
   return (
     <div className="space-y-6">
       {toast && (
-        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 flex items-center justify-between gap-4 text-xs sm:text-sm font-bold text-emerald-800">
+        <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-300 flex items-center justify-between gap-4 text-xs sm:text-sm font-bold text-emerald-800">
           <span className="flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
             <span>{toast}</span>
@@ -218,18 +218,18 @@ export function ScheduleEngineClient({
       )}
 
       {/* Top Controls Bar: Clinic / Physio / Status Filters + View Switcher + Book Button */}
-      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-[#D6CFC2] shadow-sm space-y-4">
+      <div className="bg-white rounded-lg p-5 sm:p-6 border border-border shadow-sm space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           {/* View Switcher (Daily / Weekly Calendar + List View) */}
-          <div className="inline-flex items-center rounded-2xl bg-[#F5F2EB] p-1 border border-[#D6CFC2]">
+          <div className="inline-flex items-center rounded-lg bg-muted/50 p-1 border border-border">
             <button
               type="button"
               onClick={() => setViewMode('day')}
               className={cn(
-                'px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-1.5',
+                'px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5',
                 viewMode === 'day'
-                  ? 'bg-[#00858E] text-white shadow-sm'
-                  : 'text-[#141413]/75 hover:text-[#141413]'
+                  ? 'bg-primary text-white shadow-sm'
+                  : 'text-foreground/75 hover:text-foreground'
               )}
             >
               <Calendar className="h-3.5 w-3.5" />
@@ -239,10 +239,10 @@ export function ScheduleEngineClient({
               type="button"
               onClick={() => setViewMode('week')}
               className={cn(
-                'px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-1.5',
+                'px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5',
                 viewMode === 'week'
-                  ? 'bg-[#00858E] text-white shadow-sm'
-                  : 'text-[#141413]/75 hover:text-[#141413]'
+                  ? 'bg-primary text-white shadow-sm'
+                  : 'text-foreground/75 hover:text-foreground'
               )}
             >
               <LayoutGrid className="h-3.5 w-3.5" />
@@ -252,10 +252,10 @@ export function ScheduleEngineClient({
               type="button"
               onClick={() => setViewMode('list')}
               className={cn(
-                'px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-1.5',
+                'px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5',
                 viewMode === 'list'
-                  ? 'bg-[#00858E] text-white shadow-sm'
-                  : 'text-[#141413]/75 hover:text-[#141413]'
+                  ? 'bg-primary text-white shadow-sm'
+                  : 'text-foreground/75 hover:text-foreground'
               )}
             >
               <List className="h-3.5 w-3.5" />
@@ -272,14 +272,14 @@ export function ScheduleEngineClient({
                 next.setDate(next.getDate() - (viewMode === 'day' ? 1 : 7));
                 setReferenceDate(next);
               }}
-              className="p-2 rounded-xl bg-[#F5F2EB] border border-[#D6CFC2] hover:border-[#00858E]"
+              className="p-2 rounded-xl bg-muted/50 border border-border hover:border-primary"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
             <button
               type="button"
               onClick={() => setReferenceDate(new Date())}
-              className="px-3 py-1.5 rounded-xl bg-[#F5F2EB] border border-[#D6CFC2] text-xs font-bold"
+              className="px-3 py-1.5 rounded-xl bg-muted/50 border border-border text-xs font-bold"
             >
               Today ({formatDateIST(referenceDate)})
             </button>
@@ -290,7 +290,7 @@ export function ScheduleEngineClient({
                 next.setDate(next.getDate() + (viewMode === 'day' ? 1 : 7));
                 setReferenceDate(next);
               }}
-              className="p-2 rounded-xl bg-[#F5F2EB] border border-[#D6CFC2] hover:border-[#00858E]"
+              className="p-2 rounded-xl bg-muted/50 border border-border hover:border-primary"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -302,7 +302,7 @@ export function ScheduleEngineClient({
               setError(null);
               setShowBookingModal(true);
             }}
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-[#00858E] hover:bg-[#006D75] text-white font-extrabold text-xs sm:text-sm shadow-md transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-primary hover:bg-primary/90 text-white font-semibold text-xs sm:text-sm shadow-md transition-colors"
           >
             <CalendarPlus className="h-4 w-4" />
             <span>+ Staff Booking (Manual Duration)</span>
@@ -312,14 +312,14 @@ export function ScheduleEngineClient({
         {/* Filter Row: Clinic, Physio, Status */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-[#E8E2D7]">
           <div>
-            <label className="block text-[10px] font-extrabold uppercase tracking-wider text-[#141413]/60 mb-1">
-              <Filter className="h-3 w-3 inline mr-1 text-[#00858E]" />
+            <label className="block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
+              <Filter className="h-3 w-3 inline mr-1 text-primary" />
               Filter by Clinic
             </label>
             <select
               value={clinicFilter}
               onChange={(e) => setClinicFilter(e.target.value)}
-              className="w-full px-3.5 py-2 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/60 text-xs font-bold"
+              className="w-full px-3.5 py-2 rounded-xl border border-border bg-muted/50 text-xs font-bold"
             >
               <option value="all">All Clinics ({clinics.length})</option>
               {clinics.map((c) => (
@@ -331,14 +331,14 @@ export function ScheduleEngineClient({
           </div>
 
           <div>
-            <label className="block text-[10px] font-extrabold uppercase tracking-wider text-[#141413]/60 mb-1">
-              <Stethoscope className="h-3 w-3 inline mr-1 text-[#00858E]" />
+            <label className="block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
+              <Stethoscope className="h-3 w-3 inline mr-1 text-primary" />
               Filter by Physiotherapist
             </label>
             <select
               value={physioFilter}
               onChange={(e) => setPhysioFilter(e.target.value)}
-              className="w-full px-3.5 py-2 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/60 text-xs font-bold"
+              className="w-full px-3.5 py-2 rounded-xl border border-border bg-muted/50 text-xs font-bold"
             >
               <option value="all">All Physiotherapists ({physios.length})</option>
               <option value="unassigned">Unassigned / Clinic Triage</option>
@@ -351,13 +351,13 @@ export function ScheduleEngineClient({
           </div>
 
           <div>
-            <label className="block text-[10px] font-extrabold uppercase tracking-wider text-[#141413]/60 mb-1">
+            <label className="block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
               Status Filter
             </label>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full px-3.5 py-2 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/60 text-xs font-bold"
+              className="w-full px-3.5 py-2 rounded-xl border border-border bg-muted/50 text-xs font-bold"
             >
               <option value="all">All Statuses ({appointments.length})</option>
               <option value="scheduled">Scheduled</option>
@@ -373,12 +373,12 @@ export function ScheduleEngineClient({
           VIEW MODE 1: DAILY TIME-GRID CALENDAR VIEW
       ==================================================================== */}
       {viewMode === 'day' && (
-        <div className="bg-white rounded-3xl border border-[#D6CFC2] shadow-sm overflow-hidden">
-          <div className="px-6 py-4 bg-[#F5F2EB] border-b border-[#D6CFC2] flex items-center justify-between">
-            <h2 className="text-base font-extrabold text-[#141413]">
+        <div className="bg-white rounded-lg border border-border shadow-sm overflow-hidden">
+          <div className="px-6 py-4 bg-muted/50 border-b border-border flex items-center justify-between">
+            <h2 className="text-base font-semibold text-foreground">
               Daily Time-Grid Schedule — {formatDateIST(referenceDate)}
             </h2>
-            <span className="text-xs font-bold text-[#00858E]">
+            <span className="text-xs font-bold text-primary">
               IST (09:00 AM – 08:00 PM)
             </span>
           </div>
@@ -402,27 +402,27 @@ export function ScheduleEngineClient({
 
               return (
                 <div key={hour} className="grid grid-cols-12 min-h-[72px]">
-                  <div className="col-span-2 sm:col-span-2 p-3 bg-[#F5F2EB]/40 border-r border-[#E8E2D7] text-xs font-extrabold text-[#141413]/65">
+                  <div className="col-span-2 sm:col-span-2 p-3 bg-muted/50 border-r border-[#E8E2D7] text-xs font-semibold text-foreground/65">
                     {label}
                   </div>
                   <div className="col-span-10 sm:col-span-10 p-2.5 flex flex-wrap gap-2.5 items-center">
                     {hourMatches.map((appt) => (
                       <div
                         key={appt.id}
-                        className="p-3 rounded-2xl border border-[#00858E]/30 bg-[#DCE8E6]/50 flex items-center justify-between gap-4 min-w-[260px]"
+                        className="p-3 rounded-lg border border-primary/30 bg-secondary flex items-center justify-between gap-4 min-w-[260px]"
                       >
                         <div>
-                          <p className="text-xs font-extrabold text-[#141413]">
+                          <p className="text-xs font-semibold text-foreground">
                             {appt.patient?.full_name} • {appt.manual_duration_mins} mins
                           </p>
-                          <p className="text-[11px] font-semibold text-[#00858E]">
+                          <p className="text-[11px] font-semibold text-primary">
                             {formatTimeIST(appt.start_time)} – {formatTimeIST(appt.end_time)} •{' '}
                             {appt.physio?.full_name || 'Unassigned'}
                           </p>
                         </div>
                         <Link
                           href={`/crm/consultations?appointmentId=${appt.id}`}
-                          className="px-2.5 py-1.5 rounded-lg bg-[#00858E] text-white text-[11px] font-bold"
+                          className="px-2.5 py-1.5 rounded-lg bg-primary text-white text-[11px] font-bold"
                         >
                           Open
                         </Link>
@@ -440,7 +440,7 @@ export function ScheduleEngineClient({
           VIEW MODE 2: WEEKLY CALENDAR GRID VIEW
       ==================================================================== */}
       {viewMode === 'week' && (
-        <div className="bg-white rounded-3xl border border-[#D6CFC2] shadow-sm overflow-hidden">
+        <div className="bg-white rounded-lg border border-border shadow-sm overflow-hidden">
           <div className="grid grid-cols-1 md:grid-cols-7 divide-y md:divide-y-0 md:divide-x divide-[#E8E2D7]">
             {weekDays.map((day) => {
               const dayIso = day.toISOString().slice(0, 10);
@@ -451,35 +451,35 @@ export function ScheduleEngineClient({
 
               return (
                 <div key={dayIso} className="min-h-[300px] flex flex-col">
-                  <div className="p-3.5 bg-[#F5F2EB] border-b border-[#E8E2D7] text-center">
-                    <p className="text-[11px] font-extrabold uppercase tracking-wider text-[#00858E]">
+                  <div className="p-3.5 bg-muted/50 border-b border-[#E8E2D7] text-center">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-primary">
                       {day.toLocaleDateString('en-IN', { weekday: 'short' })}
                     </p>
-                    <p className="text-sm font-extrabold text-[#141413]">
+                    <p className="text-sm font-semibold text-foreground">
                       {day.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
                     </p>
                   </div>
 
                   <div className="p-2.5 space-y-2.5 flex-1">
                     {dayAppointments.length === 0 ? (
-                      <p className="text-[11px] text-[#141413]/40 text-center py-6">
+                      <p className="text-[11px] text-foreground/40 text-center py-6">
                         No bookings
                       </p>
                     ) : (
                       dayAppointments.map((appt) => (
                         <div
                           key={appt.id}
-                          className="p-3 rounded-2xl bg-[#F5F2EB]/80 border border-[#D6CFC2] space-y-1.5 text-xs shadow-sm"
+                          className="p-3 rounded-lg bg-muted/50 border border-border space-y-1.5 text-xs shadow-sm"
                         >
                           <div className="flex items-center justify-between gap-1">
-                            <span className="font-extrabold text-[10px] px-2 py-0.5 rounded-full bg-[#00858E] text-white">
+                            <span className="font-semibold text-[10px] px-2 py-0.5 rounded-full bg-primary text-white">
                               {formatTimeIST(appt.start_time)} ({appt.manual_duration_mins}m)
                             </span>
                             <span
                               className={cn(
-                                'text-[9px] font-black uppercase px-1.5 py-0.5 rounded',
+                                'text-[9px] font-semibold uppercase px-1.5 py-0.5 rounded',
                                 appt.status === 'scheduled'
-                                  ? 'bg-[#DCE8E6] text-[#006D75]'
+                                  ? 'bg-secondary text-[#006D75]'
                                   : appt.status === 'completed'
                                   ? 'bg-emerald-100 text-emerald-800'
                                   : 'bg-red-100 text-red-700'
@@ -491,19 +491,19 @@ export function ScheduleEngineClient({
 
                           <Link
                             href={`/crm/patients/${appt.patient_id}`}
-                            className="font-extrabold text-[#141413] hover:text-[#00858E] block truncate"
+                            className="font-semibold text-foreground hover:text-primary block truncate"
                           >
                             {appt.patient?.full_name}
                           </Link>
 
-                          <p className="text-[11px] text-[#00858E] font-semibold truncate">
+                          <p className="text-[11px] text-primary font-semibold truncate">
                             {appt.physio?.full_name?.split(',')[0] || 'Unassigned'}
                           </p>
 
-                          <div className="pt-1 flex items-center justify-between gap-1 border-t border-[#D6CFC2]/60">
+                          <div className="pt-1 flex items-center justify-between gap-1 border-t border-border">
                             <Link
                               href={`/crm/consultations?appointmentId=${appt.id}`}
-                              className="text-[10px] font-extrabold text-[#00858E] hover:underline"
+                              className="text-[10px] font-semibold text-primary hover:underline"
                             >
                               Consultation →
                             </Link>
@@ -531,13 +531,13 @@ export function ScheduleEngineClient({
       {/* ====================================================================
           VIEW MODE 3: OPERATIONAL LIST / AGENDA VIEW (WITH STATUS TRIGGERS)
       ==================================================================== */}
-      <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#D6CFC2] shadow-sm space-y-4">
+      <div className="bg-white rounded-lg p-6 sm:p-7 border border-border shadow-sm space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#00858E]">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-primary">
               Reception &amp; Clinical Queue
             </span>
-            <h2 className="text-xl font-extrabold text-[#141413]">
+            <h2 className="text-xl font-semibold text-foreground">
               All Filtered Appointments ({filteredAppointments.length})
             </h2>
           </div>
@@ -547,24 +547,24 @@ export function ScheduleEngineClient({
           {filteredAppointments.map((appt) => (
             <div
               key={appt.id}
-              className="p-4 sm:p-5 rounded-2xl bg-[#F5F2EB]/60 border border-[#D6CFC2] flex flex-col lg:flex-row lg:items-center justify-between gap-4"
+              className="p-4 sm:p-5 rounded-lg bg-muted/50 border border-border flex flex-col lg:flex-row lg:items-center justify-between gap-4"
             >
               <div className="space-y-1">
                 <div className="flex items-center gap-2.5 flex-wrap">
                   <Link
                     href={`/crm/patients/${appt.patient_id}`}
-                    className="text-base font-extrabold text-[#141413] hover:text-[#00858E]"
+                    className="text-base font-semibold text-foreground hover:text-primary"
                   >
                     {appt.patient?.full_name}
                   </Link>
-                  <span className="text-xs font-semibold text-[#141413]/65">
+                  <span className="text-xs font-semibold text-foreground/65">
                     ({formatPhoneDisplay(appt.patient?.phone)})
                   </span>
                   <span
                     className={cn(
-                      'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase',
+                      'px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase',
                       appt.status === 'scheduled'
-                        ? 'bg-[#00858E] text-white'
+                        ? 'bg-primary text-white'
                         : appt.status === 'completed'
                         ? 'bg-emerald-100 text-emerald-800'
                         : appt.status === 'no_show'
@@ -574,28 +574,28 @@ export function ScheduleEngineClient({
                   >
                     {appt.status.replace('_', ' ')}
                   </span>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-white border border-[#D6CFC2] text-[#141413]/70">
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-white border border-border text-muted-foreground">
                     {appt.booking_source === 'patient_portal'
                       ? 'Patient Self-Booked'
                       : 'Staff CRM'}
                   </span>
                 </div>
 
-                <p className="text-xs font-bold text-[#141413]/85 flex items-center gap-1.5">
-                  <Clock className="h-3.5 w-3.5 text-[#00858E]" />
+                <p className="text-xs font-bold text-foreground/85 flex items-center gap-1.5">
+                  <Clock className="h-3.5 w-3.5 text-primary" />
                   <span>
                     {formatDateIST(appt.start_time)} • {formatTimeIST(appt.start_time)} –{' '}
                     {formatTimeIST(appt.end_time)} ({appt.manual_duration_mins} mins manual slot)
                   </span>
                 </p>
 
-                <p className="text-xs font-semibold text-[#00858E]">
+                <p className="text-xs font-semibold text-primary">
                   {appt.physio?.full_name || 'Unassigned / Clinic Specialist'} •{' '}
                   {appt.clinic?.name || 'The Physio Lab'}
                 </p>
 
                 {appt.chief_complaint && (
-                  <p className="text-xs text-[#141413]/75">
+                  <p className="text-xs text-foreground/75">
                     <strong>Reason:</strong> {appt.chief_complaint}
                   </p>
                 )}
@@ -605,7 +605,7 @@ export function ScheduleEngineClient({
               <div className="flex flex-wrap items-center gap-2 shrink-0">
                 <Link
                   href={`/crm/consultations?appointmentId=${appt.id}`}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#00858E] hover:bg-[#006D75] text-white text-xs font-extrabold shadow-sm transition-colors"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-semibold shadow-sm transition-colors"
                 >
                   <ClipboardList className="h-3.5 w-3.5" />
                   <span>
@@ -644,27 +644,27 @@ export function ScheduleEngineClient({
       ==================================================================== */}
       {showBookingModal && (
         <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 border border-[#D6CFC2] shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg max-w-xl w-full p-6 sm:p-8 border border-border shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-[#E8E2D7] pb-4">
               <div>
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#00858E]">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
                   Staff CRM Scheduling Engine
                 </span>
-                <h2 className="text-xl font-extrabold text-[#141413]">
+                <h2 className="text-xl font-semibold text-foreground">
                   Create Appointment (Manual Slot Duration)
                 </h2>
               </div>
               <button
                 type="button"
                 onClick={() => setShowBookingModal(false)}
-                className="p-2 rounded-xl bg-[#F5F2EB] text-[#141413]"
+                className="p-2 rounded-xl bg-muted/50 text-foreground"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
             {error && (
-              <div className="p-4 rounded-2xl bg-red-50 border border-red-200 flex items-start gap-2.5 text-xs font-bold text-red-700">
+              <div className="p-4 rounded-lg bg-red-50 border border-red-200 flex items-start gap-2.5 text-xs font-bold text-red-700">
                 <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
                 <span>{error}</span>
               </div>
@@ -676,7 +676,7 @@ export function ScheduleEngineClient({
                   <label className="text-xs font-bold uppercase">1. Select Patient *</label>
                   <Link
                     href="/crm/patients?new=1"
-                    className="text-xs font-bold text-[#00858E] hover:underline"
+                    className="text-xs font-bold text-primary hover:underline"
                   >
                     + Register New Patient
                   </Link>
@@ -685,7 +685,7 @@ export function ScheduleEngineClient({
                   required
                   value={selectedPatientId}
                   onChange={(e) => setSelectedPatientId(e.target.value)}
-                  className="w-full px-3.5 py-3 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/60 font-bold"
+                  className="w-full px-3.5 py-3 rounded-xl border border-border bg-muted/50 font-bold"
                 >
                   {patients.map((pt) => (
                     <option key={pt.id} value={pt.id}>
@@ -704,7 +704,7 @@ export function ScheduleEngineClient({
                     required
                     value={selectedClinicId}
                     onChange={(e) => setSelectedClinicId(e.target.value)}
-                    className="w-full px-3.5 py-3 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/60 font-bold"
+                    className="w-full px-3.5 py-3 rounded-xl border border-border bg-muted/50 font-bold"
                   >
                     {clinics.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -721,7 +721,7 @@ export function ScheduleEngineClient({
                   <select
                     value={selectedPhysioId}
                     onChange={(e) => setSelectedPhysioId(e.target.value)}
-                    className="w-full px-3.5 py-3 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/60 font-bold"
+                    className="w-full px-3.5 py-3 rounded-xl border border-border bg-muted/50 font-bold"
                   >
                     <option value="unassigned">Unassigned (Clinic Triage)</option>
                     {physios.map((ph) => (
@@ -741,7 +741,7 @@ export function ScheduleEngineClient({
                     required
                     value={bookingDate}
                     onChange={(e) => setBookingDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/60 font-bold"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50 font-bold"
                   />
                 </div>
                 <div>
@@ -753,7 +753,7 @@ export function ScheduleEngineClient({
                     required
                     value={bookingStartClock}
                     onChange={(e) => setBookingStartClock(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/60 font-bold"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50 font-bold"
                   />
                 </div>
                 <div>
@@ -768,14 +768,14 @@ export function ScheduleEngineClient({
                     required
                     value={manualDurationMins}
                     onChange={(e) => setManualDurationMins(Number(e.target.value))}
-                    className="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#00858E] bg-[#F5F2EB]/60 font-extrabold text-[#00858E]"
+                    className="w-full px-3.5 py-2.5 rounded-xl border-2 border-primary bg-muted/50 font-semibold text-primary"
                   />
                 </div>
               </div>
 
               {/* Quick Duration Presets */}
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[11px] font-bold text-[#141413]/60">Quick Durations:</span>
+                <span className="text-[11px] font-bold text-muted-foreground">Quick Durations:</span>
                 {[20, 30, 45, 60, 90].map((mins) => (
                   <button
                     key={mins}
@@ -784,8 +784,8 @@ export function ScheduleEngineClient({
                     className={cn(
                       'px-2.5 py-1 rounded-lg text-xs font-bold border',
                       manualDurationMins === mins
-                        ? 'bg-[#00858E] text-white border-[#00858E]'
-                        : 'bg-[#F5F2EB] text-[#141413] border-[#D6CFC2]'
+                        ? 'bg-primary text-white border-primary'
+                        : 'bg-muted/50 text-foreground border-border'
                     )}
                   >
                     {mins} mins
@@ -802,7 +802,7 @@ export function ScheduleEngineClient({
                   value={chiefComplaint}
                   onChange={(e) => setChiefComplaint(e.target.value)}
                   placeholder="e.g., Sports Injury Desmotec Rehab / Lumbar Decompression"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/60"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50"
                 />
               </div>
 
@@ -810,14 +810,14 @@ export function ScheduleEngineClient({
                 <button
                   type="button"
                   onClick={() => setShowBookingModal(false)}
-                  className="px-4 py-2.5 rounded-xl border border-[#D6CFC2] font-bold"
+                  className="px-4 py-2.5 rounded-xl border border-border font-bold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#00858E] hover:bg-[#006D75] text-white font-extrabold"
+                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold"
                 >
                   {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
                   <span>Create Booking &amp; Send WhatsApp</span>

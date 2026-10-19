@@ -135,7 +135,7 @@ export function PatientDirectoryClient({
   return (
     <div className="space-y-6">
       {toastMsg && (
-        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 flex items-center justify-between gap-4 text-xs sm:text-sm font-bold text-emerald-800">
+        <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-300 flex items-center justify-between gap-4 text-xs sm:text-sm font-bold text-emerald-800">
           <span className="flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
             <span>{toastMsg}</span>
@@ -147,25 +147,25 @@ export function PatientDirectoryClient({
       )}
 
       {/* Search Bar & Add Patient Button */}
-      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-[#D6CFC2] shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+      <div className="bg-white rounded-lg p-5 sm:p-6 border border-border shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
         <div className="relative flex-1">
-          <Search className="h-4 w-4 text-[#00858E] absolute left-4 top-1/2 -translate-y-1/2" />
+          <Search className="h-4 w-4 text-primary absolute left-4 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Instant search by patient name or mobile number (+91...)..."
-            className="w-full pl-11 pr-10 py-3 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/60 text-sm font-semibold text-[#141413] focus:outline-none focus:ring-2 focus:ring-[#00858E]"
+            className="w-full pl-11 pr-10 py-3 rounded-xl border border-border bg-muted/50 text-sm font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-[#00858E]"
           />
           {searching && (
-            <Loader2 className="h-4 w-4 text-[#00858E] animate-spin absolute right-4 top-1/2 -translate-y-1/2" />
+            <Loader2 className="h-4 w-4 text-primary animate-spin absolute right-4 top-1/2 -translate-y-1/2" />
           )}
         </div>
 
         <button
           type="button"
           onClick={() => setShowCreateModal(true)}
-          className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#00858E] hover:bg-[#006D75] text-white font-extrabold text-xs sm:text-sm shadow-sm transition-colors shrink-0"
+          className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-xs sm:text-sm shadow-sm transition-colors shrink-0"
         >
           <UserPlus className="h-4 w-4" />
           <span>+ Create Patient Profile</span>
@@ -177,41 +177,41 @@ export function PatientDirectoryClient({
         {patients.map((patient) => (
           <div
             key={patient.id}
-            className="bg-white rounded-3xl p-5 sm:p-6 border border-[#D6CFC2] shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-5 hover:border-[#00858E]/60 transition-all"
+            className="bg-white rounded-lg p-5 sm:p-6 border border-border shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-5 hover:border-primary/60 transition-all"
           >
             <div className="space-y-2">
               <div className="flex items-center gap-3 flex-wrap">
                 <Link
                   href={`/crm/patients/${patient.id}`}
-                  className="text-lg font-extrabold text-[#141413] hover:text-[#00858E]"
+                  className="text-lg font-semibold text-foreground hover:text-primary"
                 >
                   {patient.full_name}
                 </Link>
-                <span className="inline-flex items-center gap-1 text-xs font-bold px-3 py-1 rounded-full bg-[#DCE8E6] text-[#006D75]">
+                <span className="inline-flex items-center gap-1 text-xs font-bold px-3 py-1 rounded-full bg-secondary text-[#006D75]">
                   <Phone className="h-3 w-3" />
                   {formatPhoneDisplay(patient.phone)}
                 </span>
                 {patient.gender && (
-                  <span className="text-xs font-semibold uppercase text-[#141413]/60">
+                  <span className="text-xs font-semibold uppercase text-muted-foreground">
                     • {patient.gender}
                   </span>
                 )}
                 {patient.date_of_birth && (
-                  <span className="text-xs text-[#141413]/60">
+                  <span className="text-xs text-muted-foreground">
                     • DOB: {formatDateIST(patient.date_of_birth)}
                   </span>
                 )}
               </div>
 
               {patient.medical_history_notes && (
-                <p className="text-xs text-[#141413]/80 bg-[#F5F2EB] px-3.5 py-2 rounded-xl border border-[#D6CFC2]/70">
-                  <strong className="text-[#00858E]">Clinical Alert / History:</strong>{' '}
+                <p className="text-xs text-muted-foreground bg-muted/50 px-3.5 py-2 rounded-xl border border-border">
+                  <strong className="text-primary">Clinical Alert / History:</strong>{' '}
                   {patient.medical_history_notes}
                 </p>
               )}
 
               {patient.general_notes && (
-                <p className="text-xs text-[#141413]/65">
+                <p className="text-xs text-foreground/65">
                   <strong>Notes:</strong> {patient.general_notes}
                 </p>
               )}
@@ -221,7 +221,7 @@ export function PatientDirectoryClient({
             <div className="flex flex-wrap items-center gap-2.5 shrink-0">
               <Link
                 href={`/crm/schedule?book=1&patientId=${patient.id}`}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#00858E] hover:bg-[#006D75] text-white text-xs font-extrabold shadow-sm transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-semibold shadow-sm transition-colors"
               >
                 <CalendarPlus className="h-3.5 w-3.5" />
                 <span>Book Appointment</span>
@@ -231,7 +231,7 @@ export function PatientDirectoryClient({
                 type="button"
                 disabled={sendingWaId === patient.id}
                 onClick={() => handleOneClickWhatsApp(patient)}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold shadow-sm transition-colors disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm transition-colors disabled:opacity-50"
               >
                 {sendingWaId === patient.id ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -243,9 +243,9 @@ export function PatientDirectoryClient({
 
               <Link
                 href={`/crm/patients/${patient.id}`}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#F5F2EB] hover:bg-[#DCE8E6] text-[#141413] border border-[#D6CFC2] text-xs font-bold transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-muted/50 hover:bg-secondary text-foreground border border-border text-xs font-bold transition-colors"
               >
-                <ClipboardList className="h-3.5 w-3.5 text-[#00858E]" />
+                <ClipboardList className="h-3.5 w-3.5 text-primary" />
                 <span>Unified History</span>
               </Link>
             </div>
@@ -256,20 +256,20 @@ export function PatientDirectoryClient({
       {/* Create / Edit Patient Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 border border-[#D6CFC2] shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg max-w-xl w-full p-6 sm:p-8 border border-border shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-[#E8E2D7] pb-4">
               <div>
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#00858E]">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
                   Patient Registration
                 </span>
-                <h2 className="text-xl font-extrabold text-[#141413]">
+                <h2 className="text-xl font-semibold text-foreground">
                   Create / Update Patient Profile
                 </h2>
               </div>
               <button
                 type="button"
                 onClick={() => setShowCreateModal(false)}
-                className="p-2 rounded-xl bg-[#F5F2EB] text-[#141413]"
+                className="p-2 rounded-xl bg-muted/50 text-foreground"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -291,7 +291,7 @@ export function PatientDirectoryClient({
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="e.g., Gurpreet Singh"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/50 font-semibold"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50 font-semibold"
                   />
                 </div>
                 <div>
@@ -304,7 +304,7 @@ export function PatientDirectoryClient({
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+91 98150-00000"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/50 font-semibold"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50 font-semibold"
                   />
                 </div>
               </div>
@@ -315,7 +315,7 @@ export function PatientDirectoryClient({
                   <select
                     value={gender}
                     onChange={(e) => setGender(e.target.value as 'male' | 'female' | 'other')}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/50 font-semibold"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50 font-semibold"
                   >
                     <option value="male">Male</option>
                     <option value="female">Female</option>
@@ -328,7 +328,7 @@ export function PatientDirectoryClient({
                     type="date"
                     value={dob}
                     onChange={(e) => setDob(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/50 font-semibold"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50 font-semibold"
                   />
                 </div>
                 <div>
@@ -338,7 +338,7 @@ export function PatientDirectoryClient({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Optional"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/50 font-semibold"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50 font-semibold"
                   />
                 </div>
               </div>
@@ -350,7 +350,7 @@ export function PatientDirectoryClient({
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   placeholder="Barewal Awana / Sarabha Nagar, Ludhiana"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/50"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50"
                 />
               </div>
 
@@ -363,7 +363,7 @@ export function PatientDirectoryClient({
                   value={medicalNotes}
                   onChange={(e) => setMedicalNotes(e.target.value)}
                   placeholder="Past surgeries, ortho/neuro history, allergies..."
-                  className="w-full p-3 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/50"
+                  className="w-full p-3 rounded-xl border border-border bg-muted/50"
                 />
               </div>
 
@@ -376,7 +376,7 @@ export function PatientDirectoryClient({
                   value={generalNotes}
                   onChange={(e) => setGeneralNotes(e.target.value)}
                   placeholder="Preferred timings, package notes..."
-                  className="w-full p-3 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/50"
+                  className="w-full p-3 rounded-xl border border-border bg-muted/50"
                 />
               </div>
 
@@ -384,14 +384,14 @@ export function PatientDirectoryClient({
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2.5 rounded-xl border border-[#D6CFC2] font-bold"
+                  className="px-4 py-2.5 rounded-xl border border-border font-bold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-6 py-2.5 rounded-xl bg-[#00858E] text-white font-extrabold"
+                  className="px-6 py-2.5 rounded-xl bg-primary text-white font-semibold"
                 >
                   {saving ? 'Saving...' : 'Save Patient Profile'}
                 </button>

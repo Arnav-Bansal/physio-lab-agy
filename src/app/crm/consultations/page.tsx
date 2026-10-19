@@ -28,13 +28,13 @@ export default async function CrmConsultationsPage({
   return (
     <div className="space-y-6">
       <div>
-        <span className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#00858E]">
+        <span className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
           Clinical Documentation &amp; Prescriptions
         </span>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#141413] mt-1">
+        <h1 className="text-2xl sm:text-3xl font-semibold text-foreground mt-1">
           Consultation Management &amp; PDF/Image Prescription Upload
         </h1>
-        <p className="text-sm text-[#141413]/70 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           Convert scheduled appointments into consultations, record clinical notes, upload PDF or
           image prescriptions, and mark complete to sync with the Patient Portal.
         </p>

@@ -37,13 +37,13 @@ export default async function PatientPortalDashboard() {
   return (
     <div className="space-y-8">
       {/* Welcome Hero Banner */}
-      <div className="bg-gradient-to-r from-[#00858E] to-[#006D75] rounded-3xl p-7 sm:p-9 text-white shadow-lg flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+      <div className="bg-gradient-to-r from-[#00858E] to-[#006D75] rounded-lg p-7 sm:p-9 text-white shadow-lg flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div className="space-y-2">
           <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest bg-white/15 px-3 py-1 rounded-full">
             <CheckCircle2 className="h-3.5 w-3.5 text-[#5EEAD4]" />
             WhatsApp OTP Verified Session • {formatPhoneDisplay(session.phone)}
           </span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold">
+          <h1 className="text-2xl sm:text-3xl font-semibold">
             Hello, {session.fullName}
           </h1>
           <p className="text-sm text-white/85 max-w-2xl">
@@ -56,14 +56,14 @@ export default async function PatientPortalDashboard() {
         <div className="flex flex-wrap items-center gap-3 shrink-0">
           <Link
             href="/portal/book"
-            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-white text-[#00858E] hover:bg-[#F5F2EB] font-extrabold text-sm shadow-md transition-all"
+            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-white text-primary hover:bg-muted/50 font-semibold text-sm shadow-md transition-all"
           >
             <CalendarPlus className="h-4 w-4" />
             <span>Book New Appointment</span>
           </Link>
           <Link
             href="/portal/prescriptions"
-            className="inline-flex items-center gap-2 px-5 py-3.5 rounded-2xl bg-white/15 hover:bg-white/25 text-white font-bold text-sm border border-white/25 transition-all"
+            className="inline-flex items-center gap-2 px-5 py-3.5 rounded-lg bg-white/15 hover:bg-white/25 text-white font-bold text-sm border border-white/25 transition-all"
           >
             <FileText className="h-4 w-4" />
             <span>My Prescriptions ({prescriptions.length})</span>
@@ -73,44 +73,44 @@ export default async function PatientPortalDashboard() {
 
       {/* Quick KPI Summary Row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        <div className="bg-white rounded-2xl p-5 border border-[#D6CFC2] shadow-sm flex items-center justify-between">
+        <div className="bg-white rounded-lg p-5 border border-border shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-[#141413]/60">
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
               Upcoming Sessions
             </p>
-            <p className="text-3xl font-extrabold text-[#00858E] mt-1">
+            <p className="text-3xl font-semibold text-primary mt-1">
               {upcomingAppointments.length}
             </p>
           </div>
-          <div className="h-12 w-12 rounded-2xl bg-[#DCE8E6] text-[#00858E] flex items-center justify-center">
+          <div className="h-12 w-12 rounded-lg bg-secondary text-primary flex items-center justify-center">
             <CalendarCheck className="h-6 w-6" />
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-5 border border-[#D6CFC2] shadow-sm flex items-center justify-between">
+        <div className="bg-white rounded-lg p-5 border border-border shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-[#141413]/60">
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
               Completed Consultations
             </p>
-            <p className="text-3xl font-extrabold text-[#141413] mt-1">
+            <p className="text-3xl font-semibold text-foreground mt-1">
               {completedConsultations.length}
             </p>
           </div>
-          <div className="h-12 w-12 rounded-2xl bg-[#F5F2EB] text-[#141413] flex items-center justify-center">
+          <div className="h-12 w-12 rounded-lg bg-muted/50 text-foreground flex items-center justify-center">
             <Stethoscope className="h-6 w-6" />
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-5 border border-[#D6CFC2] shadow-sm flex items-center justify-between">
+        <div className="bg-white rounded-lg p-5 border border-border shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-[#141413]/60">
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
               Digital Prescriptions
             </p>
-            <p className="text-3xl font-extrabold text-[#00858E] mt-1">
+            <p className="text-3xl font-semibold text-primary mt-1">
               {prescriptions.length}
             </p>
           </div>
-          <div className="h-12 w-12 rounded-2xl bg-[#DCE8E6] text-[#00858E] flex items-center justify-center">
+          <div className="h-12 w-12 rounded-lg bg-secondary text-primary flex items-center justify-center">
             <FileText className="h-6 w-6" />
           </div>
         </div>
@@ -121,19 +121,19 @@ export default async function PatientPortalDashboard() {
         {/* Left 7 Cols: Upcoming Appointments & Latest Clinical Consultation */}
         <div className="lg:col-span-7 space-y-6">
           {/* Upcoming Appointments Card */}
-          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#D6CFC2] shadow-sm">
+          <div className="bg-white rounded-lg p-6 sm:p-7 border border-border shadow-sm">
             <div className="flex items-center justify-between gap-4 mb-5">
               <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#00858E]">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-primary">
                   Live Schedule
                 </span>
-                <h2 className="text-xl font-extrabold text-[#141413]">
+                <h2 className="text-xl font-semibold text-foreground">
                   Upcoming Appointments
                 </h2>
               </div>
               <Link
                 href="/portal/book"
-                className="text-xs font-bold text-[#00858E] hover:underline inline-flex items-center gap-1"
+                className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1"
               >
                 <span>+ Book Slot</span>
                 <ArrowRight className="h-3.5 w-3.5" />
@@ -141,18 +141,18 @@ export default async function PatientPortalDashboard() {
             </div>
 
             {upcomingAppointments.length === 0 ? (
-              <div className="bg-[#F5F2EB]/70 rounded-2xl p-8 text-center border border-dashed border-[#D6CFC2]">
-                <CalendarCheck className="h-8 w-8 text-[#00858E] mx-auto mb-2" />
-                <p className="text-sm font-bold text-[#141413]">
+              <div className="bg-muted/50 rounded-lg p-8 text-center border border-dashed border-border">
+                <CalendarCheck className="h-8 w-8 text-primary mx-auto mb-2" />
+                <p className="text-sm font-bold text-foreground">
                   No upcoming appointments scheduled
                 </p>
-                <p className="text-xs text-[#141413]/65 mt-1 mb-4">
+                <p className="text-xs text-foreground/65 mt-1 mb-4">
                   Book your next physiotherapy or sports injury session online with instant WhatsApp
                   confirmation.
                 </p>
                 <Link
                   href="/portal/book"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#00858E] text-white text-xs font-bold"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-xs font-bold"
                 >
                   <CalendarPlus className="h-4 w-4" />
                   <span>Book Appointment</span>
@@ -163,34 +163,34 @@ export default async function PatientPortalDashboard() {
                 {upcomingAppointments.map((appt) => (
                   <div
                     key={appt.id}
-                    className="rounded-2xl p-5 bg-[#F5F2EB]/60 border border-[#D6CFC2] flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                    className="rounded-lg p-5 bg-muted/50 border border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                   >
                     <div className="space-y-1.5">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-[#00858E] text-white">
+                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider bg-primary text-white">
                           Scheduled
                         </span>
-                        <span className="text-xs font-semibold text-[#141413]/70">
+                        <span className="text-xs font-semibold text-muted-foreground">
                           {appt.manual_duration_mins} mins session
                         </span>
                       </div>
-                      <p className="text-base font-extrabold text-[#141413]">
+                      <p className="text-base font-semibold text-foreground">
                         {formatDateIST(appt.start_time)} • {formatTimeIST(appt.start_time)} –{' '}
                         {formatTimeIST(appt.end_time)}
                       </p>
-                      <p className="text-xs font-semibold text-[#00858E] flex items-center gap-1.5">
+                      <p className="text-xs font-semibold text-primary flex items-center gap-1.5">
                         <Stethoscope className="h-3.5 w-3.5" />
                         <span>
                           {appt.physio?.full_name || 'Assigned Clinic Specialist'}
                           {appt.physio?.specialization ? ` (${appt.physio.specialization})` : ''}
                         </span>
                       </p>
-                      <p className="text-xs text-[#141413]/70 flex items-center gap-1.5">
-                        <MapPin className="h-3.5 w-3.5 text-[#00858E]" />
+                      <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                        <MapPin className="h-3.5 w-3.5 text-primary" />
                         <span>{appt.clinic?.name || 'The Physio Lab — Barewal Awana'}</span>
                       </p>
                       {appt.chief_complaint && (
-                        <p className="text-xs text-[#141413]/80 bg-white px-3 py-1.5 rounded-lg border border-[#D6CFC2]/70 mt-2">
+                        <p className="text-xs text-muted-foreground bg-white px-3 py-1.5 rounded-lg border border-border mt-2">
                           <strong>Reason:</strong> {appt.chief_complaint}
                         </p>
                       )}
@@ -206,19 +206,19 @@ export default async function PatientPortalDashboard() {
           </div>
 
           {/* Recent Consultation Summary Card */}
-          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#D6CFC2] shadow-sm">
+          <div className="bg-white rounded-lg p-6 sm:p-7 border border-border shadow-sm">
             <div className="flex items-center justify-between gap-4 mb-5">
               <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#00858E]">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-primary">
                   Clinical Records
                 </span>
-                <h2 className="text-xl font-extrabold text-[#141413]">
+                <h2 className="text-xl font-semibold text-foreground">
                   Recent Consultation History
                 </h2>
               </div>
               <Link
                 href="/portal/history"
-                className="text-xs font-bold text-[#00858E] hover:underline inline-flex items-center gap-1"
+                className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1"
               >
                 <span>View Full History</span>
                 <ArrowRight className="h-3.5 w-3.5" />
@@ -226,7 +226,7 @@ export default async function PatientPortalDashboard() {
             </div>
 
             {completedConsultations.length === 0 ? (
-              <p className="text-xs text-[#141413]/65 py-6 text-center">
+              <p className="text-xs text-foreground/65 py-6 text-center">
                 Completed consultation records and rehab notes will appear here after your visit.
               </p>
             ) : (
@@ -234,10 +234,10 @@ export default async function PatientPortalDashboard() {
                 {completedConsultations.slice(0, 2).map((item) => (
                   <div
                     key={item.appointment_id}
-                    className="rounded-2xl p-5 bg-[#F5F2EB]/60 border border-[#D6CFC2] space-y-3"
+                    className="rounded-lg p-5 bg-muted/50 border border-border space-y-3"
                   >
                     <div className="flex items-center justify-between gap-2 flex-wrap">
-                      <span className="text-xs font-bold text-[#00858E]">
+                      <span className="text-xs font-bold text-primary">
                         {formatDateIST(item.appointment_start)} • {item.physio_name}
                       </span>
                       <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">
@@ -246,14 +246,14 @@ export default async function PatientPortalDashboard() {
                     </div>
 
                     {item.diagnosis && (
-                      <p className="text-sm font-extrabold text-[#141413]">
+                      <p className="text-sm font-semibold text-foreground">
                         Diagnosis: {item.diagnosis}
                       </p>
                     )}
 
                     {item.treatment_plan && (
-                      <div className="bg-white rounded-xl p-3.5 border border-[#D6CFC2] text-xs text-[#141413]/85 whitespace-pre-line">
-                        <strong className="block text-[#00858E] uppercase tracking-wider text-[10px] mb-1">
+                      <div className="bg-white rounded-xl p-3.5 border border-border text-xs text-foreground/85 whitespace-pre-line">
+                        <strong className="block text-primary uppercase tracking-wider text-[10px] mb-1">
                           Prescribed Rehab Protocol:
                         </strong>
                         {item.treatment_plan}
@@ -269,19 +269,19 @@ export default async function PatientPortalDashboard() {
         {/* Right 5 Cols: Digital Prescriptions & WhatsApp Reminders Log */}
         <div className="lg:col-span-5 space-y-6">
           {/* Prescriptions Quick Vault */}
-          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#D6CFC2] shadow-sm">
+          <div className="bg-white rounded-lg p-6 sm:p-7 border border-border shadow-sm">
             <div className="flex items-center justify-between gap-4 mb-5">
               <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#00858E]">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-primary">
                   PDF &amp; Image Attachments
                 </span>
-                <h2 className="text-xl font-extrabold text-[#141413]">
+                <h2 className="text-xl font-semibold text-foreground">
                   My Prescriptions
                 </h2>
               </div>
               <Link
                 href="/portal/prescriptions"
-                className="text-xs font-bold text-[#00858E] hover:underline inline-flex items-center gap-1"
+                className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1"
               >
                 <span>Open Vault</span>
                 <ArrowRight className="h-3.5 w-3.5" />
@@ -289,7 +289,7 @@ export default async function PatientPortalDashboard() {
             </div>
 
             {prescriptions.length === 0 ? (
-              <p className="text-xs text-[#141413]/65 py-6 text-center">
+              <p className="text-xs text-foreground/65 py-6 text-center">
                 No prescriptions uploaded yet.
               </p>
             ) : (
@@ -297,10 +297,10 @@ export default async function PatientPortalDashboard() {
                 {prescriptions.map((presc) => (
                   <div
                     key={presc.id}
-                    className="p-4 rounded-2xl bg-[#F5F2EB]/70 border border-[#D6CFC2] flex items-center justify-between gap-3"
+                    className="p-4 rounded-lg bg-muted/50 border border-border flex items-center justify-between gap-3"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="h-10 w-10 rounded-xl bg-[#00858E]/10 text-[#00858E] flex items-center justify-center shrink-0">
+                      <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
                         {presc.file_type === 'pdf' ? (
                           <FileText className="h-5 w-5" />
                         ) : (
@@ -308,10 +308,10 @@ export default async function PatientPortalDashboard() {
                         )}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-extrabold text-[#141413] truncate">
+                        <p className="text-xs font-semibold text-foreground truncate">
                           {presc.file_name}
                         </p>
-                        <p className="text-[11px] text-[#141413]/65 truncate">
+                        <p className="text-[11px] text-foreground/65 truncate">
                           {presc.description || presc.file_type.toUpperCase()}
                         </p>
                       </div>
@@ -322,7 +322,7 @@ export default async function PatientPortalDashboard() {
                       target="_blank"
                       rel="noopener noreferrer"
                       download={presc.file_name}
-                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#00858E] hover:bg-[#006D75] text-white text-xs font-bold shrink-0 transition-colors"
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-bold shrink-0 transition-colors"
                     >
                       <Download className="h-3.5 w-3.5" />
                       <span>Download</span>
@@ -334,17 +334,17 @@ export default async function PatientPortalDashboard() {
           </div>
 
           {/* Automated WhatsApp Notifications Feed */}
-          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#D6CFC2] shadow-sm">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#00858E] mb-1">
+          <div className="bg-white rounded-lg p-6 sm:p-7 border border-border shadow-sm">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary mb-1">
               <MessageSquare className="h-4 w-4" />
               <span>Automated WhatsApp Reminders</span>
             </div>
-            <h2 className="text-lg font-extrabold text-[#141413] mb-4">
+            <h2 className="text-lg font-semibold text-foreground mb-4">
               Recent WhatsApp Updates
             </h2>
 
             {messageLogs.length === 0 ? (
-              <p className="text-xs text-[#141413]/65 py-4">
+              <p className="text-xs text-foreground/65 py-4">
                 Your booking confirmations and 24h / 2h WhatsApp reminders will be logged here.
               </p>
             ) : (
@@ -352,21 +352,21 @@ export default async function PatientPortalDashboard() {
                 {messageLogs.slice(0, 5).map((msg) => (
                   <div
                     key={msg.id}
-                    className="p-3.5 rounded-2xl bg-[#F5F2EB]/60 border border-[#D6CFC2] text-xs space-y-1"
+                    className="p-3.5 rounded-lg bg-muted/50 border border-border text-xs space-y-1"
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-bold uppercase tracking-wider text-[10px] text-[#00858E]">
+                      <span className="font-bold uppercase tracking-wider text-[10px] text-primary">
                         {msg.trigger_type.replace(/_/g, ' ')}
                       </span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#DCE8E6] text-[#006D75]">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-secondary text-[#006D75]">
                         {msg.status}
                       </span>
                     </div>
-                    <p className="text-[#141413]/80 font-medium">
+                    <p className="text-muted-foreground font-medium">
                       {msg.template_variables?.clinic || 'The Physio Lab'}
                       {msg.template_variables?.date ? ` • ${msg.template_variables.date}` : ''}
                     </p>
-                    <p className="text-[11px] text-[#141413]/55 flex items-center gap-1">
+                    <p className="text-[11px] text-foreground/55 flex items-center gap-1">
                       <Clock className="h-3 w-3" />
                       <span>Scheduled: {formatDateTimeIST(msg.scheduled_for)}</span>
                     </p>

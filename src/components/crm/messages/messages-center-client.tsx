@@ -159,7 +159,7 @@ export function MessagesCenterClient({
   return (
     <div className="space-y-6">
       {toast && (
-        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 flex items-center justify-between gap-4 text-xs sm:text-sm font-bold text-emerald-800">
+        <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-300 flex items-center justify-between gap-4 text-xs sm:text-sm font-bold text-emerald-800">
           <span className="flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
             <span>{toast}</span>
@@ -171,13 +171,13 @@ export function MessagesCenterClient({
       )}
 
       {/* Top Action & Filter Bar */}
-      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-[#D6CFC2] shadow-sm space-y-4">
+      <div className="bg-white rounded-lg p-5 sm:p-6 border border-border shadow-sm space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3.5 py-2.5 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/60 text-xs font-bold"
+              className="px-3.5 py-2.5 rounded-xl border border-border bg-muted/50 text-xs font-bold"
             >
               <option value="all">All Statuses ({logs.length})</option>
               <option value="queued">Queued (Scheduled 24h / 2h Reminders)</option>
@@ -190,7 +190,7 @@ export function MessagesCenterClient({
             <select
               value={triggerFilter}
               onChange={(e) => setTriggerFilter(e.target.value)}
-              className="px-3.5 py-2.5 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/60 text-xs font-bold"
+              className="px-3.5 py-2.5 rounded-xl border border-border bg-muted/50 text-xs font-bold"
             >
               <option value="all">All Lifecycle Triggers</option>
               <option value="booking_confirmation">Booking Confirmation (Immediate)</option>
@@ -208,12 +208,12 @@ export function MessagesCenterClient({
               type="button"
               disabled={runningQueue}
               onClick={handleRunDispatchWorker}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#F5F2EB] hover:bg-[#DCE8E6] text-[#141413] border border-[#D6CFC2] text-xs font-extrabold transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-muted/50 hover:bg-secondary text-foreground border border-border text-xs font-semibold transition-colors"
             >
               {runningQueue ? (
-                <Loader2 className="h-4 w-4 animate-spin text-[#00858E]" />
+                <Loader2 className="h-4 w-4 animate-spin text-primary" />
               ) : (
-                <Play className="h-4 w-4 text-[#00858E]" />
+                <Play className="h-4 w-4 text-primary" />
               )}
               <span>Run Reminder &amp; Retry Worker Now</span>
             </button>
@@ -221,7 +221,7 @@ export function MessagesCenterClient({
             <button
               type="button"
               onClick={() => setShowManualModal(true)}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#00858E] hover:bg-[#006D75] text-white text-xs font-extrabold shadow-sm transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-semibold shadow-sm transition-colors"
             >
               <Send className="h-3.5 w-3.5" />
               <span>+ Send Manual Follow-Up</span>
@@ -241,18 +241,18 @@ export function MessagesCenterClient({
           return (
             <div
               key={log.id}
-              className="bg-white rounded-3xl p-5 sm:p-6 border border-[#D6CFC2] shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-5"
+              className="bg-white rounded-lg p-5 sm:p-6 border border-border shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-5"
             >
               <div className="space-y-2 max-w-3xl">
                 <div className="flex items-center gap-2.5 flex-wrap">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#DCE8E6] text-[#006D75] text-xs font-extrabold uppercase tracking-wider">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary text-[#006D75] text-xs font-semibold uppercase tracking-wider">
                     <MessageSquare className="h-3.5 w-3.5" />
                     {log.trigger_type.replace(/_/g, ' ')}
                   </span>
 
                   <span
                     className={cn(
-                      'px-2.5 py-0.5 rounded-full text-[11px] font-extrabold uppercase',
+                      'px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase',
                       log.status === 'delivered' || log.status === 'sent'
                         ? 'bg-emerald-100 text-emerald-800'
                         : log.status === 'queued'
@@ -265,19 +265,19 @@ export function MessagesCenterClient({
                     {log.status} (Attempts: {log.attempts}/{log.max_attempts})
                   </span>
 
-                  <span className="text-xs font-bold text-[#141413]">
+                  <span className="text-xs font-bold text-foreground">
                     To: {formatPhoneDisplay(log.recipient_phone)}
                   </span>
                 </div>
 
                 {/* Rendered Dynamic Variables Message Preview */}
-                <p className="text-xs sm:text-sm text-[#141413]/85 bg-[#F5F2EB]/70 p-3.5 rounded-2xl border border-[#D6CFC2]">
+                <p className="text-xs sm:text-sm text-foreground/85 bg-muted/50 p-3.5 rounded-lg border border-border">
                   {renderedBody}
                 </p>
 
-                <div className="flex flex-wrap items-center gap-4 text-[11px] text-[#141413]/60">
+                <div className="flex flex-wrap items-center gap-4 text-[11px] text-muted-foreground">
                   <span className="inline-flex items-center gap-1">
-                    <Clock className="h-3 w-3 text-[#00858E]" />
+                    <Clock className="h-3 w-3 text-primary" />
                     Scheduled For: <strong>{formatDateTimeIST(log.scheduled_for)}</strong>
                   </span>
                   {log.sent_at && (
@@ -310,7 +310,7 @@ export function MessagesCenterClient({
                     type="button"
                     disabled={dispatchingRowId === log.id}
                     onClick={() => handleDispatchSingleRow(log.id, false)}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#00858E] hover:bg-[#006D75] text-white text-xs font-extrabold transition-colors"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-semibold transition-colors"
                   >
                     {dispatchingRowId === log.id ? (
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -340,20 +340,20 @@ export function MessagesCenterClient({
       {/* Send Manual Follow-Up Modal */}
       {showManualModal && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 border border-[#D6CFC2] shadow-2xl space-y-5">
+          <div className="bg-white rounded-lg max-w-lg w-full p-6 sm:p-8 border border-border shadow-2xl space-y-5">
             <div className="flex items-center justify-between border-b border-[#E8E2D7] pb-4">
               <div>
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#00858E]">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
                   Meta WhatsApp Cloud API
                 </span>
-                <h2 className="text-xl font-extrabold text-[#141413]">
+                <h2 className="text-xl font-semibold text-foreground">
                   Trigger Manual Patient Follow-Up
                 </h2>
               </div>
               <button
                 type="button"
                 onClick={() => setShowManualModal(false)}
-                className="p-2 rounded-xl bg-[#F5F2EB] text-[#141413]"
+                className="p-2 rounded-xl bg-muted/50 text-foreground"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -367,7 +367,7 @@ export function MessagesCenterClient({
                 <select
                   value={selectedPatientId}
                   onChange={(e) => setSelectedPatientId(e.target.value)}
-                  className="w-full px-3.5 py-3 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/60 font-bold"
+                  className="w-full px-3.5 py-3 rounded-xl border border-border bg-muted/50 font-bold"
                 >
                   {patients.map((pt) => (
                     <option key={pt.id} value={pt.id}>
@@ -386,7 +386,7 @@ export function MessagesCenterClient({
                   required
                   value={customNote}
                   onChange={(e) => setCustomNote(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#D6CFC2] bg-[#F5F2EB]/60"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50"
                 />
               </div>
 
@@ -394,14 +394,14 @@ export function MessagesCenterClient({
                 <button
                   type="button"
                   onClick={() => setShowManualModal(false)}
-                  className="px-4 py-2.5 rounded-xl border border-[#D6CFC2] font-bold"
+                  className="px-4 py-2.5 rounded-xl border border-border font-bold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={sendingManual}
-                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#00858E] text-white font-extrabold"
+                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-white font-semibold"
                 >
                   {sendingManual && <Loader2 className="h-4 w-4 animate-spin" />}
                   <span>Send WhatsApp Message</span>

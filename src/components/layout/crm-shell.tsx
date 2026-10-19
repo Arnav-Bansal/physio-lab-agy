@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -14,18 +14,24 @@ import {
   Globe,
   RefreshCw,
   UserCheck,
+  Plus,
+  PanelLeft,
 } from 'lucide-react';
-import { BrandLogo } from '@/components/brand/logo';
 import { cn } from '@/lib/utils';
 import type { CrmSession } from '@/lib/auth/session';
 
-const CRM_NAV = [
+const MAIN_NAV = [
   { href: '/crm', label: 'Dashboard', icon: LayoutDashboard, exact: true },
-  { href: '/crm/schedule', label: 'Schedule & Calendar', icon: Calendar, exact: false },
-  { href: '/crm/patients', label: 'Patients & History', icon: Users, exact: false },
+  { href: '/crm/patients', label: 'Patients', icon: Users, exact: false },
+  { href: '/crm/schedule', label: 'Appointments', icon: Calendar, exact: false },
   { href: '/crm/consultations', label: 'Consultations & Rx', icon: Stethoscope, exact: false },
-  { href: '/crm/messages', label: 'WhatsApp & Retries', icon: MessageSquare, exact: false },
-  { href: '/crm/admin', label: 'Admin Controls', icon: Settings, exact: false, adminOnly: false },
+  { href: '/crm/messages', label: 'WhatsApp Logs', icon: MessageSquare, exact: false },
+  { href: '/crm/admin', label: 'Admin Settings', icon: Settings, exact: false },
+];
+
+const QUICK_ACTIONS = [
+  { href: '/crm/patients', label: 'Add Patient', icon: Plus },
+  { href: '/crm/schedule?book=1', label: 'Create Appointment', icon: Calendar },
 ];
 
 export function CrmShell({
@@ -36,143 +42,183 @@ export function CrmShell({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const [collapsed, setCollapsed] = useState(false);
 
-  // Render standalone login view when at /crm/login or unauthenticated
   if (pathname === '/crm/login' || !session) {
     return <>{children}</>;
   }
 
   return (
-    <div className="min-h-screen flex bg-stone-linen">
-      {/* Desktop Left Sidebar */}
-      <aside className="hidden lg:flex w-72 shrink-0 flex-col bg-[#141413] text-white border-r border-white/10">
-        <div className="p-6 border-b border-white/10">
-          <Link href="/">
-            <BrandLogo variant="light" compact />
-          </Link>
-          <div className="mt-4 flex items-center justify-between px-3 py-2 rounded-xl bg-white/5 border border-white/10">
-            <div className="min-w-0">
-              <p className="text-xs font-extrabold text-white truncate">{session.fullName}</p>
-              <p className="text-[11px] text-white/60 truncate">{session.email}</p>
+    <div className="min-h-screen flex w-full bg-background">
+      {/* Light Clinical Sidebar matching physio-lab.lovable.app */}
+      <aside
+        className={cn(
+          'hidden lg:flex shrink-0 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-200',
+          collapsed ? 'w-16' : 'w-64'
+        )}
+      >
+        {/* Sidebar Header */}
+        <div className="border-b border-sidebar-border p-4">
+          <Link href="/" className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white border border-sidebar-border p-0.5">
+              <img
+                src="/images/clinic/lovable-logo.png"
+                alt="The Physio Lab"
+                className="h-6 w-6 object-contain"
+              />
             </div>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#00858E] text-white shrink-0">
-              {session.role}
-            </span>
+            {!collapsed && (
+              <div className="flex flex-col min-w-0">
+                <span className="text-sm font-semibold text-sidebar-foreground truncate">
+                  The Physio Lab
+                </span>
+                <span className="text-xs text-sidebar-foreground/60 truncate">
+                  {session.fullName}
+                </span>
+              </div>
+            )}
+          </Link>
+        </div>
+
+        {/* Sidebar Navigation Groups */}
+        <div className="flex-1 overflow-y-auto p-3 space-y-6">
+          {/* Main Group */}
+          <div>
+            {!collapsed && (
+              <div className="px-2 pb-1.5 text-xs font-medium text-sidebar-foreground/60">
+                Main
+              </div>
+            )}
+            <nav className="space-y-1">
+              {MAIN_NAV.map((item) => {
+                const Icon = item.icon;
+                const active = item.exact
+                  ? pathname === item.href
+                  : pathname.startsWith(item.href);
+
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    title={item.label}
+                    className={cn(
+                      'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors',
+                      active
+                        ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
+                        : 'text-sidebar-foreground hover:bg-sidebar-accent/50'
+                    )}
+                  >
+                    <Icon className="h-4 w-4 shrink-0" />
+                    {!collapsed && <span className="truncate">{item.label}</span>}
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+
+          {/* Actions Group */}
+          <div>
+            {!collapsed && (
+              <div className="px-2 pb-1.5 text-xs font-medium text-sidebar-foreground/60">
+                Actions
+              </div>
+            )}
+            <nav className="space-y-1">
+              {QUICK_ACTIONS.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    title={item.label}
+                    className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
+                  >
+                    <Icon className="h-4 w-4 shrink-0" />
+                    {!collapsed && <span className="truncate">{item.label}</span>}
+                  </Link>
+                );
+              })}
+            </nav>
           </div>
         </div>
 
-        <nav className="flex-1 p-4 space-y-1.5">
-          {CRM_NAV.map((item) => {
-            const Icon = item.icon;
-            const active = item.exact
-              ? pathname === item.href
-              : pathname.startsWith(item.href);
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  'flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all',
-                  active
-                    ? 'bg-[#00858E] text-white shadow-md shadow-[#00858E]/25'
-                    : 'text-white/70 hover:text-white hover:bg-white/5'
-                )}
-              >
-                <span className="flex items-center gap-3">
-                  <Icon className="h-4 w-4 shrink-0" />
-                  <span>{item.label}</span>
-                </span>
-                {item.href === '/crm/admin' && (
-                  <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-white/10 text-[#5EEAD4]">
-                    Admin
-                  </span>
-                )}
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="p-4 border-t border-white/10 space-y-2">
+        {/* Sidebar Footer */}
+        <div className="p-3 border-t border-sidebar-border space-y-1">
           <Link
             href="/crm/login"
-            className="w-full flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/15 text-white transition-colors"
+            title="Switch Role"
+            className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-xs font-medium text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
           >
-            <RefreshCw className="h-3.5 w-3.5 text-[#5EEAD4]" />
-            <span>Switch Role (Admin / Staff / Physio)</span>
+            <RefreshCw className="h-4 w-4 shrink-0 text-primary" />
+            {!collapsed && <span>Switch Role ({session.role})</span>}
           </Link>
-
-          <div className="grid grid-cols-2 gap-2">
+          <div className="flex items-center gap-1">
             <Link
               href="/portal"
-              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-white/5 hover:bg-white/10 text-white/80"
+              title="Patient Portal"
+              className="flex-1 flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs text-sidebar-foreground/75 hover:bg-sidebar-accent/50 transition-colors"
             >
-              <UserCheck className="h-3.5 w-3.5 text-[#5EEAD4]" />
-              <span>Portal</span>
+              <UserCheck className="h-3.5 w-3.5 shrink-0" />
+              {!collapsed && <span>Portal</span>}
             </Link>
             <Link
               href="/"
-              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-white/5 hover:bg-white/10 text-white/80"
+              title="Public Website"
+              className="flex-1 flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs text-sidebar-foreground/75 hover:bg-sidebar-accent/50 transition-colors"
             >
-              <Globe className="h-3.5 w-3.5 text-[#5EEAD4]" />
-              <span>Website</span>
+              <Globe className="h-3.5 w-3.5 shrink-0" />
+              {!collapsed && <span>Website</span>}
             </Link>
+            <a
+              href="/api/auth/logout?next=/crm/login"
+              title="Sign Out"
+              className="flex items-center justify-center rounded-md p-1.5 text-xs text-destructive hover:bg-destructive/10 transition-colors"
+            >
+              <LogOut className="h-3.5 w-3.5 shrink-0" />
+            </a>
           </div>
-
-          <a
-            href="/api/auth/logout?next=/crm/login"
-            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-red-300 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 transition-colors"
-          >
-            <LogOut className="h-3.5 w-3.5" />
-            <span>Sign Out</span>
-          </a>
         </div>
       </aside>
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 pb-20 lg:pb-0">
-        {/* Top Operational Bar */}
-        <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-[#D6CFC2] px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      {/* Main Content Area matching physio-lab.lovable.app */}
+      <div className="flex-1 flex flex-col min-w-0 pb-16 lg:pb-0">
+        <header className="h-14 flex items-center justify-between border-b border-border bg-background px-4">
           <div className="flex items-center gap-3">
-            <div className="lg:hidden">
-              <Link href="/">
-                <BrandLogo compact showTagline={false} />
-              </Link>
-            </div>
-            <span className="text-xs font-extrabold uppercase tracking-wider text-[#00858E] bg-[#DCE8E6] px-3 py-1 rounded-full">
-              The Physio Lab CRM • {session.role.toUpperCase()}
-            </span>
-            <span className="hidden md:inline text-xs font-semibold text-[#141413]/70">
-              {session.specialization || 'Barewal Awana Flagship Centre'}
+            <button
+              type="button"
+              onClick={() => setCollapsed((c) => !c)}
+              className="hidden lg:inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted text-muted-foreground transition-colors"
+              aria-label="Toggle Sidebar"
+            >
+              <PanelLeft className="h-4 w-4" />
+            </button>
+            <span className="text-sm font-medium text-muted-foreground">
+              The Physio Lab — {session.fullName}
             </span>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center rounded-md bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground capitalize">
+              {session.role}
+            </span>
             <Link
               href="/crm/schedule?book=1"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-extrabold bg-[#00858E] hover:bg-[#006D75] text-white shadow-sm transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
             >
-              <Calendar className="h-3.5 w-3.5" />
-              <span>+ New Booking</span>
-            </Link>
-            <Link
-              href="/crm/login"
-              className="lg:hidden inline-flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-bold bg-[#F5F2EB] border border-[#D6CFC2]"
-            >
-              <RefreshCw className="h-3.5 w-3.5 text-[#00858E]" />
-              <span>Role</span>
+              <Plus className="h-3.5 w-3.5" />
+              <span>Add Appointment</span>
             </Link>
           </div>
         </header>
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+        <main className="flex-1 p-6 space-y-6 max-w-7xl w-full mx-auto">
           {children}
         </main>
       </div>
 
       {/* Mobile Bottom Nav */}
-      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-[#141413] text-white border-t border-white/10 px-2 py-1.5 grid grid-cols-6 gap-1">
-        {CRM_NAV.map((item) => {
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-background border-t border-border px-2 py-1.5 grid grid-cols-6 gap-1">
+        {MAIN_NAV.map((item) => {
           const Icon = item.icon;
           const active = item.exact
             ? pathname === item.href
@@ -182,8 +228,8 @@ export function CrmShell({
               key={item.href}
               href={item.href}
               className={cn(
-                'flex flex-col items-center justify-center py-1.5 rounded-lg text-[10px] font-bold',
-                active ? 'bg-[#00858E] text-white' : 'text-white/65'
+                'flex flex-col items-center justify-center py-1.5 rounded-md text-[11px] font-medium',
+                active ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
               )}
             >
               <Icon className="h-4 w-4 mb-0.5" />

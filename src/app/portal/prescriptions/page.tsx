@@ -17,23 +17,23 @@ export default async function PatientPrescriptionsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <span className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#00858E]">
+        <span className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
           Secure Clinical Storage
         </span>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#141413] mt-1">
+        <h1 className="text-2xl sm:text-3xl font-semibold text-foreground mt-1">
           My Digital Prescriptions &amp; Exercise Charts
         </h1>
-        <p className="text-sm text-[#141413]/70 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           Preview and download both PDF rehabilitation protocols and image exercise charts uploaded
           by your physiotherapist.
         </p>
       </div>
 
       {prescriptions.length === 0 ? (
-        <div className="bg-white rounded-3xl p-12 text-center border border-[#D6CFC2]">
-          <FileText className="h-10 w-10 text-[#00858E] mx-auto mb-3" />
-          <h2 className="text-lg font-extrabold text-[#141413]">No Prescriptions Available</h2>
-          <p className="text-xs text-[#141413]/65 mt-1">
+        <div className="bg-white rounded-lg p-12 text-center border border-border">
+          <FileText className="h-10 w-10 text-primary mx-auto mb-3" />
+          <h2 className="text-lg font-semibold text-foreground">No Prescriptions Available</h2>
+          <p className="text-xs text-foreground/65 mt-1">
             Any PDF or image prescriptions uploaded during your consultation will be securely
             accessible here.
           </p>
