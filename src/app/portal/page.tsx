@@ -35,37 +35,31 @@ export default async function PatientPortalDashboard() {
   const completedConsultations = history.filter((h) => h.consultation_status === 'completed');
 
   return (
-    <div className="space-y-8">
-      {/* Welcome Hero Banner */}
-      <div className="bg-gradient-to-r from-[#00858E] to-[#006D75] rounded-lg p-7 sm:p-9 text-white shadow-lg flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-        <div className="space-y-2">
-          <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest bg-white/15 px-3 py-1 rounded-full">
-            <CheckCircle2 className="h-3.5 w-3.5 text-[#5EEAD4]" />
-            WhatsApp OTP Verified Session • {formatPhoneDisplay(session.phone)}
-          </span>
-          <h1 className="text-2xl sm:text-3xl font-semibold">
-            Hello, {session.fullName}
+    <div className="space-y-6">
+      {/* Clean Welcome Header matching physio-lab.lovable.app */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-primary">
+            Welcome, {session.fullName}
           </h1>
-          <p className="text-sm text-white/85 max-w-2xl">
-            Manage your upcoming rehabilitation sessions at{' '}
-            <strong>The Physio Lab — Barewal Awana</strong>, review your doctor&apos;s consultation
-            notes, and download your PDF or image exercise prescriptions.
+          <p className="text-muted-foreground">
+            Manage your upcoming appointments, consultation notes, and prescriptions.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 shrink-0">
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
           <Link
             href="/portal/book"
-            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-white text-primary hover:bg-muted/50 font-semibold text-sm shadow-md transition-all"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 font-medium text-sm shadow-sm transition-colors"
           >
             <CalendarPlus className="h-4 w-4" />
             <span>Book New Appointment</span>
           </Link>
           <Link
             href="/portal/prescriptions"
-            className="inline-flex items-center gap-2 px-5 py-3.5 rounded-lg bg-white/15 hover:bg-white/25 text-white font-bold text-sm border border-white/25 transition-all"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-input bg-card hover:bg-accent hover:text-accent-foreground font-medium text-sm transition-colors"
           >
-            <FileText className="h-4 w-4" />
+            <FileText className="h-4 w-4 text-primary" />
             <span>My Prescriptions ({prescriptions.length})</span>
           </Link>
         </div>

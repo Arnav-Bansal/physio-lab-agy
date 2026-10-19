@@ -59,6 +59,12 @@ export async function getCrmSession(): Promise<CrmSession | null> {
   try {
     const parsed = JSON.parse(Buffer.from(raw, 'base64url').toString('utf-8')) as CrmSession;
     if (parsed && parsed.profileId && ['admin', 'staff', 'physio'].includes(parsed.role)) {
+      if (
+        parsed.profileId === '11111111-1111-4111-8111-111111111101' ||
+        parsed.fullName?.includes('Guneet')
+      ) {
+        parsed.fullName = 'Dr. Som';
+      }
       return parsed;
     }
     return null;

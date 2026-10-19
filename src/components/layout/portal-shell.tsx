@@ -71,7 +71,7 @@ export function PortalShell({
           <div className="flex items-center gap-2.5">
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-md bg-muted text-xs">
               <UserCheck className="h-3.5 w-3.5 text-primary" />
-              <span className="font-medium text-foreground">{session.fullName}</span>
+              <span className="font-semibold text-primary">Welcome, {session.fullName}</span>
               <span className="text-muted-foreground">({formatPhoneDisplay(session.phone)})</span>
             </div>
 

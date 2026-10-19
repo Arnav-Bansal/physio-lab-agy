@@ -256,8 +256,8 @@ export function CrmShell({
             >
               <PanelLeft className="h-4 w-4" />
             </button>
-            <span className="text-sm font-medium text-muted-foreground">
-              The Physio Lab — {session.fullName}
+            <span className="text-sm font-semibold text-primary">
+              Welcome, {session.fullName}
             </span>
           </div>
 

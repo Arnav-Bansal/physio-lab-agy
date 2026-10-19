@@ -19,7 +19,7 @@ const DEMO_CRM_PROFILES = [
     id: '11111111-1111-4111-8111-111111111101',
     role: 'admin',
     title: 'Admin — Full Multi-Clinic Control',
-    name: 'Dr. Guneet Singh',
+    name: 'Dr. Som',
     email: 'admin@thephysiolab.in',
     desc: 'Manage clinics, physios, staff roles, WhatsApp templates, and full schedule.',
     icon: UserCog,
