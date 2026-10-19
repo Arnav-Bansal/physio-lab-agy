@@ -17,6 +17,7 @@ import {
   Plus,
   PanelLeft,
 } from 'lucide-react';
+import { BrandEmblem } from '@/components/brand/logo';
 import { cn } from '@/lib/utils';
 import type { CrmSession } from '@/lib/auth/session';
 
@@ -60,13 +61,7 @@ export function CrmShell({
         {/* Sidebar Header */}
         <div className="border-b border-sidebar-border p-4">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white border border-sidebar-border p-0.5">
-              <img
-                src="/images/clinic/lovable-logo.png"
-                alt="The Physio Lab"
-                className="h-6 w-6 object-contain"
-              />
-            </div>
+            <BrandEmblem className="h-8 w-8" />
             {!collapsed && (
               <div className="flex flex-col min-w-0">
                 <span className="text-sm font-semibold text-sidebar-foreground truncate">
