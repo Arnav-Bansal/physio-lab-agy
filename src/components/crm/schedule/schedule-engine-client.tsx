@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
@@ -83,6 +83,16 @@ export function ScheduleEngineClient({
   const [selectedPatientId, setSelectedPatientId] = useState(
     searchParams.get('patientId') || patients[0]?.id || ''
   );
+
+  useEffect(() => {
+    const pid = searchParams.get('patientId');
+    if (pid) {
+      setSelectedPatientId(pid);
+    }
+    if (!isPhysio && searchParams.get('book') === '1') {
+      setShowBookingModal(true);
+    }
+  }, [searchParams, isPhysio]);
   const [selectedClinicId, setSelectedClinicId] = useState(clinics[0]?.id || '');
   const [selectedPhysioId, setSelectedPhysioId] = useState<string>(
     physios[0]?.id || 'unassigned'
@@ -628,70 +638,91 @@ export function ScheduleEngineClient({
       ==================================================================== */}
       {viewMode === 'week' && (
         <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
-          <div className="grid grid-cols-1 md:grid-cols-7 divide-y md:divide-y-0 md:divide-x divide-border">
-            {weekDays.map((day) => {
-              const dayIso = day.toISOString().slice(0, 10);
-              const dayAppointments = filteredAppointments.filter((a) => {
-                const istDate = new Date(new Date(a.start_time).getTime() + 5.5 * 3600 * 1000);
-                return istDate.toISOString().slice(0, 10) === dayIso;
-              });
+          <div className="overflow-x-auto">
+            <div className="min-w-[960px] grid grid-cols-7 divide-x divide-border">
+              {weekDays.map((day) => {
+                const dayIso = day.toISOString().slice(0, 10);
+                const dayAppointments = filteredAppointments.filter((a) => {
+                  const istDate = new Date(
+                    new Date(a.start_time).getTime() + 5.5 * 3600 * 1000
+                  );
+                  return istDate.toISOString().slice(0, 10) === dayIso;
+                });
 
-              return (
-                <div key={dayIso} className="min-h-[340px] flex flex-col">
-                  <div className="p-3.5 bg-muted/40 border-b border-border text-center">
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
-                      {day.toLocaleDateString('en-IN', { weekday: 'short' })}
-                    </p>
-                    <p className="text-sm font-bold font-mono text-foreground mt-0.5">
-                      {day.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
-                    </p>
-                  </div>
-
-                  <div className="p-2.5 space-y-2.5 flex-1">
-                    {dayAppointments.length === 0 ? (
-                      <p className="text-[11px] text-muted-foreground/50 text-center py-8">
-                        No slots booked
+                return (
+                  <div key={dayIso} className="min-h-[360px] flex flex-col">
+                    <div className="p-3.5 bg-muted/40 border-b border-border text-center">
+                      <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
+                        {day.toLocaleDateString('en-IN', { weekday: 'short' })}
                       </p>
-                    ) : (
-                      dayAppointments.map((appt) => (
-                        <button
-                          key={appt.id}
-                          type="button"
-                          onClick={() => setInspectedAppointment(appt)}
-                          className="w-full text-left p-3 rounded-xl bg-muted/40 hover:bg-secondary/60 border border-border hover:border-primary/40 space-y-1.5 text-xs shadow-sm transition-all"
-                        >
-                          <div className="flex items-center justify-between gap-1">
-                            <span className="font-mono font-bold text-[10px] px-2 py-0.5 rounded-md bg-primary text-white">
-                              {formatTimeIST(appt.start_time)} ({appt.manual_duration_mins}m)
-                            </span>
-                            <span
-                              className={cn(
-                                'text-[9px] font-bold uppercase px-1.5 py-0.5 rounded',
-                                appt.status === 'scheduled'
-                                  ? 'bg-secondary text-secondary-foreground'
-                                  : appt.status === 'completed'
-                                  ? 'bg-emerald-100 text-emerald-800'
-                                  : 'bg-red-100 text-red-700'
-                              )}
+                      <p className="text-sm font-bold font-mono text-foreground mt-0.5">
+                        {day.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+                      </p>
+                    </div>
+
+                    <div className="p-2.5 space-y-2.5 flex-1">
+                      {dayAppointments.length === 0 ? (
+                        <div className="py-8 text-center space-y-2">
+                          <p className="text-[11px] text-muted-foreground/50">
+                            No slots booked
+                          </p>
+                          {!isPhysio && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setBookingDate(dayIso);
+                                setError(null);
+                                setShowBookingModal(true);
+                              }}
+                              className="inline-flex items-center gap-1 text-[10px] font-bold text-primary hover:underline"
                             >
-                              {appt.status.replace('_', ' ')}
-                            </span>
-                          </div>
+                              <Plus className="h-3 w-3" />
+                              <span>Book Slot</span>
+                            </button>
+                          )}
+                        </div>
+                      ) : (
+                        dayAppointments.map((appt) => (
+                          <button
+                            key={appt.id}
+                            type="button"
+                            onClick={() => setInspectedAppointment(appt)}
+                            className="w-full text-left p-2.5 rounded-xl bg-muted/40 hover:bg-secondary/60 border border-border hover:border-primary/40 space-y-1.5 text-xs shadow-sm transition-all"
+                          >
+                            <div className="flex flex-wrap items-center justify-between gap-1">
+                              <span className="font-mono font-bold text-[10px] px-1.5 py-0.5 rounded bg-primary text-white whitespace-nowrap">
+                                {formatTimeIST(appt.start_time)}
+                              </span>
+                              <span
+                                className={cn(
+                                  'text-[9px] font-bold uppercase px-1.5 py-0.5 rounded whitespace-nowrap',
+                                  appt.status === 'scheduled'
+                                    ? 'bg-secondary text-secondary-foreground'
+                                    : appt.status === 'completed'
+                                    ? 'bg-emerald-100 text-emerald-800'
+                                    : 'bg-red-100 text-red-700'
+                                )}
+                              >
+                                {appt.status.replace('_', ' ')}
+                              </span>
+                            </div>
 
-                          <p className="font-bold text-foreground truncate">
-                            {appt.patient?.full_name}
-                          </p>
+                            <p className="font-bold text-foreground truncate">
+                              {appt.patient?.full_name}
+                            </p>
 
-                          <p className="text-[11px] text-primary font-semibold truncate">
-                            {appt.physio?.full_name?.split(',')[0] || 'Clinic Triage'}
-                          </p>
-                        </button>
-                      ))
-                    )}
+                            <p className="text-[10px] text-primary font-semibold truncate">
+                              {appt.physio?.full_name?.split(',')[0] || 'Clinic Triage'} •{' '}
+                              {appt.manual_duration_mins}m
+                            </p>
+                          </button>
+                        ))
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
       )}

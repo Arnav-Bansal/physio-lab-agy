@@ -1,4 +1,5 @@
 import React from 'react';
+import { CalendarPlus } from 'lucide-react';
 import { repositories } from '@/lib/repositories';
 import { SelfBookingWizard } from '@/components/portal/self-booking-wizard';
 
@@ -17,14 +18,15 @@ export default async function PatientBookAppointmentPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <span className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-          Self-Service Scheduling
+      <div className="space-y-1">
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-primary bg-secondary px-2.5 py-0.5 rounded-md">
+          <CalendarPlus className="h-3.5 w-3.5" />
+          <span>Self-Service Scheduling</span>
         </span>
-        <h1 className="text-2xl sm:text-3xl font-semibold text-foreground mt-1">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground pt-1">
           Book Your Physiotherapy Session
         </h1>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="text-xs sm:text-sm text-muted-foreground">
           Select your preferred clinic branch, optional specialist physiotherapist, and real-time
           available time slot.
         </p>

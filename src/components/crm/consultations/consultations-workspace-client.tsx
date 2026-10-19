@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -64,6 +64,8 @@ export function ConsultationsWorkspaceClient({
   const router = useRouter();
   const [consultations, setConsultations] =
     useState<ConsultationListItem[]>(initialConsultations);
+  const [scheduledQueue, setScheduledQueue] =
+    useState<AppointmentWithRelations[]>(scheduledAppointments);
   const [selectedId, setSelectedId] = useState<string>(
     initialSelectedId || initialConsultations[0]?.id || ''
   );
@@ -97,6 +99,23 @@ export function ConsultationsWorkspaceClient({
   const [convertingApptId, setConvertingApptId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setConsultations(initialConsultations);
+  }, [initialConsultations]);
+
+  useEffect(() => {
+    setScheduledQueue(scheduledAppointments);
+  }, [scheduledAppointments]);
+
+  useEffect(() => {
+    if (initialSelectedId) {
+      const target = initialConsultations.find((c) => c.id === initialSelectedId);
+      if (target) {
+        selectConsultation(target);
+      }
+    }
+  }, [initialSelectedId, initialConsultations]);
 
   const filteredConsultations = useMemo(() => {
     return consultations.filter((c) => {
@@ -143,6 +162,7 @@ export function ConsultationsWorkspaceClient({
     setConvertingApptId(appointmentId);
     setError(null);
     try {
+      const sourceAppt = scheduledQueue.find((a) => a.id === appointmentId);
       const res = await fetch('/api/crm/consultations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -151,6 +171,23 @@ export function ConsultationsWorkspaceClient({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Could not convert appointment');
 
+      if (data.consultation) {
+        const enriched: ConsultationListItem = {
+          ...data.consultation,
+          patient: data.consultation.patient || sourceAppt?.patient || null,
+          clinic: data.consultation.clinic || sourceAppt?.clinic || null,
+          physio: data.consultation.physio || sourceAppt?.physio || null,
+          prescriptions: data.consultation.prescriptions || [],
+        };
+        setConsultations((prev) => [
+          enriched,
+          ...prev.filter((c) => c.id !== enriched.id),
+        ]);
+        selectConsultation(enriched);
+      }
+
+      setScheduledQueue((prev) => prev.filter((a) => a.id !== appointmentId));
+      setToast('Clinical SOAP chart opened for scheduled appointment.');
       router.push(`/crm/consultations?appointmentId=${appointmentId}`);
       router.refresh();
     } catch (err) {
@@ -278,13 +315,13 @@ export function ConsultationsWorkspaceClient({
       )}
 
       {/* Quick Bar: Convert Unopened Scheduled Appointments into Consultations */}
-      {scheduledAppointments.length > 0 && (
+      {scheduledQueue.length > 0 && (
         <div className="bg-white rounded-2xl p-5 border border-border shadow-sm space-y-3">
           <div className="flex items-center justify-between">
             <p className="text-xs font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">
               <Sparkles className="h-3.5 w-3.5" />
               <span>
-                Start Consultation from Scheduled Queue ({scheduledAppointments.length})
+                Start Consultation from Scheduled Queue ({scheduledQueue.length})
               </span>
             </p>
             <span className="text-[11px] text-muted-foreground">
@@ -292,7 +329,7 @@ export function ConsultationsWorkspaceClient({
             </span>
           </div>
           <div className="flex flex-wrap gap-2">
-            {scheduledAppointments.map((appt) => (
+            {scheduledQueue.map((appt) => (
               <button
                 key={appt.id}
                 type="button"

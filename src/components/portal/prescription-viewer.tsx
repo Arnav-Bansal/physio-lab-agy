@@ -51,23 +51,23 @@ export function PrescriptionVaultViewer({
           return (
             <div
               key={item.id}
-              className="bg-white rounded-lg p-6 border border-border shadow-sm flex flex-col justify-between gap-5"
+              className="bg-white rounded-2xl p-6 border border-border shadow-sm flex flex-col justify-between gap-5"
             >
               <div className="space-y-4">
                 <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-lg bg-secondary text-primary flex items-center justify-center shrink-0">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="h-12 w-12 rounded-xl bg-secondary text-primary flex items-center justify-center shrink-0">
                       {isPdf ? (
                         <FileText className="h-6 w-6" />
                       ) : (
                         <ImageIcon className="h-6 w-6" />
                       )}
                     </div>
-                    <div>
-                      <span className="inline-block text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-muted/50 text-primary border border-border">
+                    <div className="min-w-0">
+                      <span className="inline-block text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-muted/60 text-primary border border-border">
                         {isPdf ? 'PDF Prescription Document' : 'Image Exercise Chart'}
                       </span>
-                      <h3 className="text-base font-semibold text-foreground mt-1 break-all">
+                      <h3 className="text-base font-bold text-foreground mt-1 break-all">
                         {item.file_name}
                       </h3>
                     </div>
@@ -75,7 +75,7 @@ export function PrescriptionVaultViewer({
                 </div>
 
                 {!isPdf && (
-                  <div className="rounded-lg overflow-hidden border border-border h-44 bg-[#141413]">
+                  <div className="rounded-xl overflow-hidden border border-border h-44 bg-[#141E1E]">
                     <img
                       src={fileUrl}
                       alt={item.file_name}
@@ -84,14 +84,14 @@ export function PrescriptionVaultViewer({
                   </div>
                 )}
 
-                <p className="text-xs text-foreground/75 leading-relaxed">
+                <p className="text-xs text-muted-foreground leading-relaxed">
                   {item.description ||
                     item.consultation?.diagnosis ||
                     'Clinical prescription and exercise protocol.'}
                 </p>
 
-                <div className="flex flex-wrap items-center gap-4 text-[11px] text-muted-foreground pt-2 border-t border-[#F5F2EB]">
-                  <span className="inline-flex items-center gap-1">
+                <div className="flex flex-wrap items-center gap-4 text-[11px] text-muted-foreground pt-2.5 border-t border-border/70">
+                  <span className="inline-flex items-center gap-1 font-mono">
                     <Calendar className="h-3.5 w-3.5 text-primary" />
                     {formatDateIST(item.created_at)}
                   </span>
@@ -99,7 +99,7 @@ export function PrescriptionVaultViewer({
                     <MapPin className="h-3.5 w-3.5 text-primary" />
                     {item.clinic?.name || 'The Physio Lab — Barewal Awana'}
                   </span>
-                  <span>• {formatFileSize(item.file_size_bytes)}</span>
+                  <span className="font-mono">• {formatFileSize(item.file_size_bytes)}</span>
                 </div>
               </div>
 
@@ -131,14 +131,20 @@ export function PrescriptionVaultViewer({
 
       {/* Inline Preview Modal for PDF & Image Prescriptions */}
       {previewItem && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-border">
-            <div className="px-6 py-4 border-b border-[#E8E2D7] flex items-center justify-between gap-4">
+        <div
+          className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setPreviewItem(null)}
+        >
+          <div
+            className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-border"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="px-6 py-4 border-b border-border flex items-center justify-between gap-4">
               <div>
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
                   {previewItem.file_type.toUpperCase()} Prescription Preview
                 </span>
-                <h3 className="text-base font-semibold text-foreground">
+                <h3 className="text-base font-bold text-foreground">
                   {previewItem.file_name}
                 </h3>
               </div>
@@ -154,14 +160,14 @@ export function PrescriptionVaultViewer({
                 <button
                   type="button"
                   onClick={() => setPreviewItem(null)}
-                  className="p-2 rounded-xl bg-muted/50 hover:bg-muted text-foreground"
+                  className="p-2 rounded-xl bg-muted/60 hover:bg-muted text-foreground"
                 >
                   <X className="h-4 w-4" />
                 </button>
               </div>
             </div>
 
-            <div className="flex-1 bg-[#141413] overflow-auto flex items-center justify-center min-h-[460px]">
+            <div className="flex-1 bg-[#141E1E] overflow-auto flex items-center justify-center min-h-[460px]">
               {previewItem.file_type === 'pdf' ? (
                 <iframe
                   src={previewItem.signed_url || previewItem.storage_path}

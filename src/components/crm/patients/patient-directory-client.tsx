@@ -55,8 +55,20 @@ export function PatientDirectoryClient({
   const [sendingWaId, setSendingWaId] = useState<string | null>(null);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
+  // Sync ?new=1 query param when navigating via sidebar shortcut
+  useEffect(() => {
+    if (!isPhysio && searchParams.get('new') === '1') {
+      setShowCreateModal(true);
+    }
+  }, [searchParams, isPhysio]);
+
   // Debounced fast search by name or phone number
   useEffect(() => {
+    if (!query.trim()) {
+      setPatients(initialPatients);
+      return;
+    }
+
     const timer = setTimeout(async () => {
       setSearching(true);
       try {
@@ -71,7 +83,7 @@ export function PatientDirectoryClient({
     }, 150);
 
     return () => clearTimeout(timer);
-  }, [query]);
+  }, [query, initialPatients]);
 
   async function handleCreatePatient(e: React.FormEvent) {
     e.preventDefault();

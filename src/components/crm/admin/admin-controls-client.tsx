@@ -7,10 +7,12 @@ import {
   CheckCircle2,
   Loader2,
   MessageSquare,
+  Pencil,
   Plus,
   ShieldAlert,
   Stethoscope,
   Users,
+  X,
 } from 'lucide-react';
 import type {
   ClinicRecord,
@@ -40,13 +42,15 @@ export function AdminControlsClient({
   const [profiles, setProfiles] = useState<ProfileRecord[]>(initialProfiles);
   const [templates, setTemplates] = useState<MessageTemplateRecord[]>(initialTemplates);
 
-  // Add Clinic Form
+  // Add / Edit Clinic Form
+  const [editingClinicSlug, setEditingClinicSlug] = useState<string | null>(null);
   const [clinicName, setClinicName] = useState('');
   const [clinicAddress, setClinicAddress] = useState('');
   const [clinicPhone, setClinicPhone] = useState('+91 93161-96000');
   const [slotDuration, setSlotDuration] = useState(30);
 
-  // Add Physio / Staff Form
+  // Add / Edit Physio / Staff Form
+  const [editingProfileId, setEditingProfileId] = useState<string | null>(null);
   const [userFullName, setUserFullName] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [userPhone, setUserPhone] = useState('');
@@ -59,6 +63,46 @@ export function AdminControlsClient({
 
   const isAdmin = currentUserRole === 'admin';
 
+  function handlePrefillClinic(c: ClinicRecord) {
+    setEditingClinicSlug(c.slug);
+    setClinicName(c.name);
+    setClinicAddress(c.address);
+    setClinicPhone(c.phone);
+    setSlotDuration(c.default_slot_duration_mins);
+    setError(null);
+  }
+
+  function handleResetClinicForm() {
+    setEditingClinicSlug(null);
+    setClinicName('');
+    setClinicAddress('');
+    setClinicPhone('+91 93161-96000');
+    setSlotDuration(30);
+  }
+
+  function handlePrefillProfile(p: ProfileRecord) {
+    setEditingProfileId(p.id);
+    setUserFullName(p.full_name);
+    setUserEmail(p.email || '');
+    setUserPhone(p.phone || '');
+    setUserRole(
+      p.role === 'admin' || p.role === 'staff' || p.role === 'physio'
+        ? p.role
+        : 'physio'
+    );
+    setUserSpecialization(p.specialization || '');
+    setError(null);
+  }
+
+  function handleResetProfileForm() {
+    setEditingProfileId(null);
+    setUserFullName('');
+    setUserEmail('');
+    setUserPhone('');
+    setUserRole('physio');
+    setUserSpecialization('');
+  }
+
   async function handleSaveClinic(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -70,6 +114,7 @@ export function AdminControlsClient({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           entity: 'clinic',
+          slug: editingClinicSlug || undefined,
           name: clinicName,
           address: clinicAddress,
           phone: clinicPhone,
@@ -83,8 +128,7 @@ export function AdminControlsClient({
         ...prev.filter((c) => c.id !== data.clinic.id),
         data.clinic,
       ]);
-      setClinicName('');
-      setClinicAddress('');
+      handleResetClinicForm();
       setToast(`Saved clinic branch: ${data.clinic.name}`);
       router.refresh();
     } catch (err) {
@@ -120,11 +164,10 @@ export function AdminControlsClient({
         ...prev.filter((p) => p.id !== data.profile.id),
         data.profile,
       ]);
-      setUserFullName('');
-      setUserEmail('');
-      setUserPhone('');
-      setUserSpecialization('');
-      setToast(`Added ${data.profile.role.toUpperCase()} profile: ${data.profile.full_name}`);
+      handleResetProfileForm();
+      setToast(
+        `Saved ${data.profile.role.toUpperCase()} profile: ${data.profile.full_name}`
+      );
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save user');
@@ -163,7 +206,7 @@ export function AdminControlsClient({
   return (
     <div className="space-y-6">
       {!isAdmin && (
-        <div className="p-4 rounded-lg bg-amber-50 border border-amber-300 flex items-center gap-3 text-xs sm:text-sm font-bold text-amber-900">
+        <div className="p-4 rounded-xl bg-amber-50 border border-amber-300 flex items-center gap-3 text-xs sm:text-sm font-bold text-amber-900">
           <ShieldAlert className="h-5 w-5 text-amber-600 shrink-0" />
           <span>
             You are currently viewing Admin Controls in read-only mode as{' '}
@@ -174,25 +217,30 @@ export function AdminControlsClient({
       )}
 
       {toast && (
-        <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-300 flex items-center gap-2 text-xs sm:text-sm font-bold text-emerald-800">
-          <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-          <span>{toast}</span>
+        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-300 flex items-center justify-between gap-2 text-xs sm:text-sm font-bold text-emerald-800">
+          <span className="flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+            <span>{toast}</span>
+          </span>
+          <button type="button" onClick={() => setToast(null)}>
+            <X className="h-4 w-4" />
+          </button>
         </div>
       )}
 
       {error && (
-        <div className="p-4 rounded-lg bg-red-50 border border-red-200 text-xs sm:text-sm font-bold text-red-700">
+        <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-xs sm:text-sm font-bold text-red-700">
           {error}
         </div>
       )}
 
       {/* Tab Selector */}
-      <div className="inline-flex items-center rounded-lg bg-white p-1.5 border border-border shadow-sm">
+      <div className="inline-flex flex-wrap items-center rounded-2xl bg-white p-1.5 border border-border shadow-sm gap-1">
         <button
           type="button"
           onClick={() => setActiveTab('clinics')}
           className={cn(
-            'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all',
+            'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all',
             activeTab === 'clinics'
               ? 'bg-primary text-white shadow-sm'
               : 'text-muted-foreground hover:text-foreground'
@@ -206,7 +254,7 @@ export function AdminControlsClient({
           type="button"
           onClick={() => setActiveTab('users')}
           className={cn(
-            'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all',
+            'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all',
             activeTab === 'users'
               ? 'bg-primary text-white shadow-sm'
               : 'text-muted-foreground hover:text-foreground'
@@ -220,7 +268,7 @@ export function AdminControlsClient({
           type="button"
           onClick={() => setActiveTab('templates')}
           className={cn(
-            'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all',
+            'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all',
             activeTab === 'templates'
               ? 'bg-primary text-white shadow-sm'
               : 'text-muted-foreground hover:text-foreground'
@@ -233,40 +281,75 @@ export function AdminControlsClient({
 
       {/* TAB 1: MANAGE CLINICS */}
       {activeTab === 'clinics' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div className="lg:col-span-7 space-y-4">
-            {clinics.map((c) => (
-              <div
-                key={c.id}
-                className="bg-white rounded-lg p-6 border border-border shadow-sm space-y-2"
-              >
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-foreground">{c.name}</h3>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase bg-emerald-100 text-emerald-800">
-                    Active Branch
-                  </span>
+            {clinics.map((c) => {
+              const isEditing = editingClinicSlug === c.slug;
+              return (
+                <div
+                  key={c.id}
+                  className={cn(
+                    'bg-white rounded-2xl p-6 border shadow-sm space-y-2.5 transition-all',
+                    isEditing ? 'border-2 border-primary bg-secondary/20' : 'border-border'
+                  )}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="text-lg font-bold text-foreground">{c.name}</h3>
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800">
+                          Active Branch
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {c.address}, {c.city}, {c.state} — {c.pincode}
+                      </p>
+                    </div>
+
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => handlePrefillClinic(c)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-muted/60 hover:bg-secondary text-foreground border border-border text-xs font-bold shrink-0 transition-colors"
+                      >
+                        <Pencil className="h-3 w-3 text-primary" />
+                        <span>Edit Branch</span>
+                      </button>
+                    )}
+                  </div>
+
+                  <p className="text-xs font-mono font-bold text-primary pt-1 border-t border-border/60">
+                    Phone: {formatPhoneDisplay(c.phone)} • Default Slot:{' '}
+                    {c.default_slot_duration_mins} mins
+                  </p>
                 </div>
-                <p className="text-xs text-foreground/75">
-                  {c.address}, {c.city}, {c.state} — {c.pincode}
-                </p>
-                <p className="text-xs font-bold text-primary">
-                  Phone: {formatPhoneDisplay(c.phone)} • Default Slot: {c.default_slot_duration_mins}{' '}
-                  mins
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="lg:col-span-5">
             <form
               onSubmit={handleSaveClinic}
-              className="bg-white rounded-lg p-6 border border-border shadow-sm space-y-4 text-xs sm:text-sm"
+              className="bg-white rounded-2xl p-6 border border-border shadow-sm space-y-4 text-xs sm:text-sm"
             >
-              <h3 className="text-lg font-semibold text-foreground">
-                + Add / Update Clinic Branch
-              </h3>
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-foreground">
+                  {editingClinicSlug ? 'Edit Clinic Branch' : '+ Add / Update Clinic Branch'}
+                </h3>
+                {editingClinicSlug && (
+                  <button
+                    type="button"
+                    onClick={handleResetClinicForm}
+                    className="text-xs font-bold text-primary hover:underline"
+                  >
+                    Reset
+                  </button>
+                )}
+              </div>
               <div>
-                <label className="block text-xs font-bold uppercase mb-1">Clinic Name *</label>
+                <label className="block text-xs font-bold uppercase text-muted-foreground mb-1">
+                  Clinic Name *
+                </label>
                 <input
                   type="text"
                   required
@@ -274,11 +357,13 @@ export function AdminControlsClient({
                   value={clinicName}
                   onChange={(e) => setClinicName(e.target.value)}
                   placeholder="e.g., The Physio Lab — Sarabha Nagar"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50 font-semibold"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/40 font-semibold"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold uppercase mb-1">Street Address *</label>
+                <label className="block text-xs font-bold uppercase text-muted-foreground mb-1">
+                  Street Address *
+                </label>
                 <input
                   type="text"
                   required
@@ -286,23 +371,25 @@ export function AdminControlsClient({
                   value={clinicAddress}
                   onChange={(e) => setClinicAddress(e.target.value)}
                   placeholder="Sarabha Nagar Main Market, Ludhiana"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/40"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold uppercase mb-1">Phone *</label>
+                  <label className="block text-xs font-bold uppercase text-muted-foreground mb-1">
+                    Phone *
+                  </label>
                   <input
                     type="tel"
                     required
                     disabled={!isAdmin}
                     value={clinicPhone}
                     onChange={(e) => setClinicPhone(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50 font-semibold"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/40 font-mono font-semibold"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold uppercase mb-1">
+                  <label className="block text-xs font-bold uppercase text-muted-foreground mb-1">
                     Default Slot (Mins)
                   </label>
                   <input
@@ -310,17 +397,21 @@ export function AdminControlsClient({
                     disabled={!isAdmin}
                     value={slotDuration}
                     onChange={(e) => setSlotDuration(Number(e.target.value))}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50 font-semibold"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/40 font-mono font-semibold"
                   />
                 </div>
               </div>
               <button
                 type="submit"
                 disabled={!isAdmin || saving}
-                className="w-full inline-flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-primary text-white font-semibold disabled:opacity-50"
+                className="w-full inline-flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-sm transition-colors disabled:opacity-50"
               >
-                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                <span>Save Clinic Branch</span>
+                {saving ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Plus className="h-4 w-4" />
+                )}
+                <span>{editingClinicSlug ? 'Update Clinic Branch' : 'Save Clinic Branch'}</span>
               </button>
             </form>
           </div>
@@ -329,44 +420,78 @@ export function AdminControlsClient({
 
       {/* TAB 2: MANAGE PHYSIOS & STAFF USERS */}
       {activeTab === 'users' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div className="lg:col-span-7 space-y-3">
-            {profiles.map((p) => (
-              <div
-                key={p.id}
-                className="bg-white rounded-lg p-5 border border-border shadow-sm flex items-center justify-between gap-4"
-              >
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-base font-semibold text-foreground">
-                      {p.full_name}
-                    </span>
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase bg-primary text-white">
-                      {p.role}
-                    </span>
+            {profiles.map((p) => {
+              const isEditing = editingProfileId === p.id;
+              return (
+                <div
+                  key={p.id}
+                  className={cn(
+                    'bg-white rounded-2xl p-5 border shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all',
+                    isEditing ? 'border-2 border-primary bg-secondary/20' : 'border-border'
+                  )}
+                >
+                  <div className="space-y-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-base font-bold text-foreground">
+                        {p.full_name}
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-primary text-white">
+                        {p.role}
+                      </span>
+                    </div>
+                    <p className="text-xs font-semibold text-primary">
+                      {p.specialization || 'Clinic Operations & Administration'}
+                    </p>
+                    <p className="text-xs font-mono text-muted-foreground">
+                      {p.email} • {formatPhoneDisplay(p.phone)}
+                    </p>
                   </div>
-                  <p className="text-xs font-semibold text-primary">
-                    {p.specialization || 'Clinic Operations'}
-                  </p>
-                  <p className="text-xs text-foreground/65">
-                    {p.email} • {formatPhoneDisplay(p.phone)}
-                  </p>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => handlePrefillProfile(p)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-muted/60 hover:bg-secondary text-foreground border border-border text-xs font-bold transition-colors"
+                      >
+                        <Pencil className="h-3 w-3 text-primary" />
+                        <span>Edit Role / Profile</span>
+                      </button>
+                    )}
+                    <Stethoscope className="h-5 w-5 text-primary shrink-0 hidden sm:block" />
+                  </div>
                 </div>
-                <Stethoscope className="h-6 w-6 text-primary shrink-0" />
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="lg:col-span-5">
             <form
               onSubmit={handleSaveUserProfile}
-              className="bg-white rounded-lg p-6 border border-border shadow-sm space-y-4 text-xs sm:text-sm"
+              className="bg-white rounded-2xl p-6 border border-border shadow-sm space-y-4 text-xs sm:text-sm"
             >
-              <h3 className="text-lg font-semibold text-foreground">
-                + Onboard Physio / Staff Member
-              </h3>
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-foreground">
+                  {editingProfileId
+                    ? 'Edit User Profile & Role'
+                    : '+ Onboard Physio / Staff Member'}
+                </h3>
+                {editingProfileId && (
+                  <button
+                    type="button"
+                    onClick={handleResetProfileForm}
+                    className="text-xs font-bold text-primary hover:underline"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
               <div>
-                <label className="block text-xs font-bold uppercase mb-1">Full Name *</label>
+                <label className="block text-xs font-bold uppercase text-muted-foreground mb-1">
+                  Full Name *
+                </label>
                 <input
                   type="text"
                   required
@@ -374,12 +499,14 @@ export function AdminControlsClient({
                   value={userFullName}
                   onChange={(e) => setUserFullName(e.target.value)}
                   placeholder="Dr. Simranjit Kaur, MPT"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50 font-semibold"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/40 font-semibold"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold uppercase mb-1">Email *</label>
+                  <label className="block text-xs font-bold uppercase text-muted-foreground mb-1">
+                    Email *
+                  </label>
                   <input
                     type="email"
                     required
@@ -387,18 +514,20 @@ export function AdminControlsClient({
                     value={userEmail}
                     onChange={(e) => setUserEmail(e.target.value)}
                     placeholder="doctor@thephysiolab.in"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/40"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold uppercase mb-1">Role *</label>
+                  <label className="block text-xs font-bold uppercase text-muted-foreground mb-1">
+                    Role *
+                  </label>
                   <select
                     disabled={!isAdmin}
                     value={userRole}
                     onChange={(e) =>
                       setUserRole(e.target.value as 'physio' | 'staff' | 'admin')
                     }
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50 font-bold"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/40 font-bold"
                   >
                     <option value="physio">Physio (Doctor)</option>
                     <option value="staff">Reception / Staff</option>
@@ -407,18 +536,20 @@ export function AdminControlsClient({
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-bold uppercase mb-1">Phone</label>
+                <label className="block text-xs font-bold uppercase text-muted-foreground mb-1">
+                  Phone
+                </label>
                 <input
                   type="tel"
                   disabled={!isAdmin}
                   value={userPhone}
                   onChange={(e) => setUserPhone(e.target.value)}
                   placeholder="+91 98153-70609"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/40 font-mono"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold uppercase mb-1">
+                <label className="block text-xs font-bold uppercase text-muted-foreground mb-1">
                   Clinical Pillar / Specialization
                 </label>
                 <input
@@ -427,16 +558,20 @@ export function AdminControlsClient({
                   value={userSpecialization}
                   onChange={(e) => setUserSpecialization(e.target.value)}
                   placeholder="Sports Injury Centre / Neuro Rehab / Ortho"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/50"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-muted/40"
                 />
               </div>
               <button
                 type="submit"
                 disabled={!isAdmin || saving}
-                className="w-full inline-flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-primary text-white font-semibold disabled:opacity-50"
+                className="w-full inline-flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-sm transition-colors disabled:opacity-50"
               >
-                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                <span>Save User Profile</span>
+                {saving ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Plus className="h-4 w-4" />
+                )}
+                <span>{editingProfileId ? 'Update User Profile' : 'Save User Profile'}</span>
               </button>
             </form>
           </div>
@@ -446,7 +581,7 @@ export function AdminControlsClient({
       {/* TAB 3: CONFIGURE WHATSAPP MESSAGE TEMPLATES */}
       {activeTab === 'templates' && (
         <div className="space-y-4">
-          <div className="bg-secondary rounded-lg p-4 border border-primary/25 text-xs font-semibold text-[#006D75]">
+          <div className="bg-secondary/70 rounded-2xl p-4 border border-primary/20 text-xs font-semibold text-secondary-foreground">
             Supported Dynamic Variables: <code>{'{{name}}'}</code> (Patient Name),{' '}
             <code>{'{{date}}'}</code> (Appointment Date &amp; Time IST),{' '}
             <code>{'{{clinic}}'}</code> (Clinic Branch), and <code>{'{{physio}}'}</code> (Assigned
@@ -457,14 +592,14 @@ export function AdminControlsClient({
             {templates.map((tpl, idx) => (
               <div
                 key={tpl.id}
-                className="bg-white rounded-lg p-6 border border-border shadow-sm space-y-4"
+                className="bg-white rounded-2xl p-6 border border-border shadow-sm space-y-4"
               >
                 <div className="flex items-center justify-between gap-2">
                   <div>
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
                       Trigger: {tpl.trigger_type}
                     </span>
-                    <h3 className="text-base font-semibold text-foreground">{tpl.name}</h3>
+                    <h3 className="text-base font-bold text-foreground">{tpl.name}</h3>
                   </div>
 
                   <label className="inline-flex items-center gap-2 text-xs font-bold">
@@ -496,7 +631,7 @@ export function AdminControlsClient({
                       next[idx] = { ...tpl, meta_template_name: e.target.value };
                       setTemplates(next);
                     }}
-                    className="w-full px-3 py-2 rounded-xl border border-border bg-muted/50 text-xs font-mono font-bold"
+                    className="w-full px-3 py-2 rounded-xl border border-border bg-muted/40 text-xs font-mono font-bold"
                   />
                 </div>
 
@@ -513,7 +648,7 @@ export function AdminControlsClient({
                       next[idx] = { ...tpl, body_preview: e.target.value };
                       setTemplates(next);
                     }}
-                    className="w-full p-3 rounded-xl border border-border bg-muted/50 text-xs"
+                    className="w-full p-3 rounded-xl border border-border bg-muted/40 text-xs"
                   />
                 </div>
 
@@ -522,7 +657,7 @@ export function AdminControlsClient({
                     type="button"
                     disabled={!isAdmin || saving}
                     onClick={() => handleUpdateTemplate(tpl)}
-                    className="px-4 py-2 rounded-xl bg-primary text-white text-xs font-semibold disabled:opacity-50"
+                    className="px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-bold transition-colors disabled:opacity-50"
                   >
                     Save Template
                   </button>
