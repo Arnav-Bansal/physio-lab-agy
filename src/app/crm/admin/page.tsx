@@ -12,6 +12,11 @@ export default async function CrmAdminPage() {
     redirect('/crm/login');
   }
 
+  // RBAC: Strictly restricted to 'admin' role
+  if (session.role !== 'admin') {
+    redirect('/crm');
+  }
+
   const [clinics, profiles, templates] = await Promise.all([
     repositories.clinics.listAllClinics().catch(() => []),
     repositories.profiles.listAllProfiles().catch(() => []),
@@ -21,15 +26,12 @@ export default async function CrmAdminPage() {
   return (
     <div className="space-y-6">
       <div>
-        <span className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-          System Administration
-        </span>
-        <h1 className="text-2xl sm:text-3xl font-semibold text-foreground mt-1">
-          Admin Control Center — Clinics, Physios &amp; Templates
+        <h1 className="text-3xl font-bold tracking-tight text-primary">
+          Admin Settings — Clinics, Users &amp; Templates
         </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Configure multi-branch clinics, onboard specialist physiotherapists and reception staff,
-          and customize WhatsApp notification templates.
+        <p className="text-muted-foreground mt-1">
+          Configure multi-branch clinics, onboard physiotherapists and reception staff, and
+          customize WhatsApp notification templates.
         </p>
       </div>
 

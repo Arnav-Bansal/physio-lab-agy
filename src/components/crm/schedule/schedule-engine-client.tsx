@@ -33,6 +33,8 @@ interface ScheduleEngineClientProps {
   clinics: ClinicRecord[];
   physios: ProfileRecord[];
   patients: PatientRecord[];
+  currentUserRole?: 'admin' | 'staff' | 'physio' | 'patient';
+  currentPhysioId?: string;
 }
 
 const HOURS_GRID = [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
@@ -42,21 +44,26 @@ export function ScheduleEngineClient({
   clinics,
   physios,
   patients,
+  currentUserRole = 'admin',
+  currentPhysioId,
 }: ScheduleEngineClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const isPhysio = currentUserRole === 'physio';
 
   const [appointments, setAppointments] =
     useState<AppointmentWithRelations[]>(initialAppointments);
   const [viewMode, setViewMode] = useState<'week' | 'day' | 'list'>('week');
   const [clinicFilter, setClinicFilter] = useState<string>('all');
-  const [physioFilter, setPhysioFilter] = useState<string>('all');
+  const [physioFilter, setPhysioFilter] = useState<string>(
+    currentPhysioId || 'all'
+  );
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [referenceDate, setReferenceDate] = useState<Date>(() => new Date());
 
-  // Staff Booking Drawer State
+  // Staff Booking Drawer State (Admin & Staff only)
   const [showBookingModal, setShowBookingModal] = useState(
-    searchParams.get('book') === '1'
+    !isPhysio && searchParams.get('book') === '1'
   );
   const [selectedPatientId, setSelectedPatientId] = useState(
     searchParams.get('patientId') || patients[0]?.id || ''
@@ -296,21 +303,23 @@ export function ScheduleEngineClient({
             </button>
           </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              setError(null);
-              setShowBookingModal(true);
-            }}
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-primary hover:bg-primary/90 text-white font-semibold text-xs sm:text-sm shadow-md transition-colors"
-          >
-            <CalendarPlus className="h-4 w-4" />
-            <span>+ Staff Booking (Manual Duration)</span>
-          </button>
+          {!isPhysio && (
+            <button
+              type="button"
+              onClick={() => {
+                setError(null);
+                setShowBookingModal(true);
+              }}
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-primary hover:bg-primary/90 text-white font-semibold text-xs sm:text-sm shadow-md transition-colors"
+            >
+              <CalendarPlus className="h-4 w-4" />
+              <span>+ Staff Booking (Manual Duration)</span>
+            </button>
+          )}
         </div>
 
         {/* Filter Row: Clinic, Physio, Status */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-[#E8E2D7]">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-border">
           <div>
             <label className="block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
               <Filter className="h-3 w-3 inline mr-1 text-primary" />
@@ -333,20 +342,23 @@ export function ScheduleEngineClient({
           <div>
             <label className="block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
               <Stethoscope className="h-3 w-3 inline mr-1 text-primary" />
-              Filter by Physiotherapist
+              {isPhysio ? 'Assigned Physiotherapist (Locked)' : 'Filter by Physiotherapist'}
             </label>
             <select
               value={physioFilter}
+              disabled={isPhysio}
               onChange={(e) => setPhysioFilter(e.target.value)}
-              className="w-full px-3.5 py-2 rounded-xl border border-border bg-muted/50 text-xs font-bold"
+              className="w-full px-3.5 py-2 rounded-xl border border-border bg-muted/50 text-xs font-bold disabled:opacity-75"
             >
-              <option value="all">All Physiotherapists ({physios.length})</option>
-              <option value="unassigned">Unassigned / Clinic Triage</option>
-              {physios.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.full_name}
-                </option>
-              ))}
+              {!isPhysio && <option value="all">All Physiotherapists ({physios.length})</option>}
+              {!isPhysio && <option value="unassigned">Unassigned / Clinic Triage</option>}
+              {physios
+                .filter((p) => !isPhysio || p.id === currentPhysioId)
+                .map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.full_name}
+                  </option>
+                ))}
             </select>
           </div>
 

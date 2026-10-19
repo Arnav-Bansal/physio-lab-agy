@@ -12,12 +12,20 @@ export async function GET(request: Request) {
 
     const { searchParams } = new URL(request.url);
     const clinicId = searchParams.get('clinicId') || undefined;
-    const physioId = searchParams.get('physioId') || undefined;
+    const requestedPhysioId = searchParams.get('physioId') || undefined;
     const status = (searchParams.get('status') as AppointmentStatus) || undefined;
+
+    // RBAC: Physio role is strictly restricted to their own appointments
+    const effectivePhysioId =
+      session.role === 'physio'
+        ? session.profileId
+        : requestedPhysioId === 'all'
+        ? undefined
+        : requestedPhysioId;
 
     const appointments = await repositories.appointments.listSchedule({
       clinicId: clinicId === 'all' ? undefined : clinicId,
-      physioId: physioId === 'all' ? undefined : physioId,
+      physioId: effectivePhysioId,
       status,
     });
 
@@ -33,6 +41,14 @@ export async function POST(request: Request) {
     const session = await getCrmSession();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // RBAC: Only Admin and Reception Staff can create new bookings in CRM
+    if (session.role === 'physio') {
+      return NextResponse.json(
+        { error: 'Forbidden: Only Admin and Reception Staff can create new bookings.' },
+        { status: 403 }
+      );
     }
 
     const body = await request.json();

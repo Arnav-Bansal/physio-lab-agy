@@ -12,6 +12,7 @@ import {
   Phone,
   Stethoscope,
 } from 'lucide-react';
+import { getCrmSession } from '@/lib/auth/session';
 import { repositories } from '@/lib/repositories';
 import {
   formatDateIST,
@@ -29,11 +30,15 @@ export default async function CrmPatientDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const session = await getCrmSession();
+  const isPhysio = session?.role === 'physio';
 
   const [patient, history, messageLogs] = await Promise.all([
     repositories.patients.getPatientById(id).catch(() => null),
     repositories.patients.getUnifiedHistory(id).catch(() => []),
-    repositories.messages.listMessageLogs(id, 20).catch(() => []),
+    isPhysio
+      ? Promise.resolve([])
+      : repositories.messages.listMessageLogs(id, 20).catch(() => []),
   ]);
 
   if (!patient) {
@@ -50,7 +55,7 @@ export default async function CrmPatientDetailPage({
         <span>Back to Patient Directory</span>
       </Link>
 
-      {/* Patient Profile Header & 1-Click Quick Actions */}
+      {/* Patient Profile Header & Role-Scoped Quick Actions */}
       <div className="bg-white rounded-lg p-6 sm:p-8 border border-border shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div className="space-y-2.5">
           <div className="flex items-center gap-3 flex-wrap">
@@ -83,20 +88,32 @@ export default async function CrmPatientDetailPage({
           )}
         </div>
 
-        {/* 1-Click Quick Actions */}
+        {/* Role-Scoped Quick Actions */}
         <div className="flex flex-wrap items-center gap-3 shrink-0">
-          <Link
-            href={`/crm/schedule?book=1&patientId=${patient.id}`}
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-primary hover:bg-primary/90 text-white font-semibold text-xs sm:text-sm shadow-sm transition-colors"
-          >
-            <CalendarPlus className="h-4 w-4" />
-            <span>1-Click Book Appointment</span>
-          </Link>
+          {!isPhysio ? (
+            <>
+              <Link
+                href={`/crm/schedule?book=1&patientId=${patient.id}`}
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-primary hover:bg-primary/90 text-white font-semibold text-xs sm:text-sm shadow-sm transition-colors"
+              >
+                <CalendarPlus className="h-4 w-4" />
+                <span>1-Click Book Appointment</span>
+              </Link>
 
-          <PatientQuickWhatsAppButton
-            patientId={patient.id}
-            patientName={patient.full_name}
-          />
+              <PatientQuickWhatsAppButton
+                patientId={patient.id}
+                patientName={patient.full_name}
+              />
+            </>
+          ) : (
+            <Link
+              href="/crm/consultations"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-primary hover:bg-primary/90 text-white font-semibold text-xs sm:text-sm shadow-sm transition-colors"
+            >
+              <Stethoscope className="h-4 w-4" />
+              <span>Open My Consultations &amp; Rx</span>
+            </Link>
+          )}
         </div>
       </div>
 

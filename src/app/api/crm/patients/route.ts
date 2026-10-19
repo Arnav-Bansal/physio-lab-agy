@@ -11,9 +11,23 @@ export async function GET(request: Request) {
 
     const { searchParams } = new URL(request.url);
     const query = searchParams.get('q') || '';
-    const patients = await repositories.patients.searchPatients(query, 50);
+    const allPatients = await repositories.patients.searchPatients(query, 50);
 
-    return NextResponse.json({ patients });
+    if (session.role === 'physio') {
+      const [schedule, consultations] = await Promise.all([
+        repositories.appointments.listSchedule({ physioId: session.profileId }),
+        repositories.consultations.listConsultations(undefined, session.profileId),
+      ]);
+      const assignedIds = new Set([
+        ...schedule.map((a) => a.patient_id),
+        ...consultations.map((c) => c.patient_id),
+      ]);
+      return NextResponse.json({
+        patients: allPatients.filter((p) => assignedIds.has(p.id)),
+      });
+    }
+
+    return NextResponse.json({ patients: allPatients });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to search patients';
     return NextResponse.json({ error: message }, { status: 500 });
@@ -25,6 +39,13 @@ export async function POST(request: Request) {
     const session = await getCrmSession();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized CRM session' }, { status: 401 });
+    }
+
+    if (session.role === 'physio') {
+      return NextResponse.json(
+        { error: 'Forbidden: Only Admin and Reception Staff can create or update patient profiles.' },
+        { status: 403 }
+      );
     }
 
     const body = await request.json();

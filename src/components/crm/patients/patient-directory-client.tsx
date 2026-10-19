@@ -19,18 +19,23 @@ import { formatPhoneDisplay, formatDateIST } from '@/lib/utils';
 
 export function PatientDirectoryClient({
   initialPatients,
+  currentUserRole = 'admin',
 }: {
   initialPatients: PatientRecord[];
+  currentUserRole?: 'admin' | 'staff' | 'physio' | 'patient';
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const isPhysio = currentUserRole === 'physio';
 
   const [patients, setPatients] = useState<PatientRecord[]>(initialPatients);
   const [query, setQuery] = useState('');
   const [searching, setSearching] = useState(false);
 
-  // Create Patient Modal State
-  const [showCreateModal, setShowCreateModal] = useState(searchParams.get('new') === '1');
+  // Create Patient Modal State (Admin & Staff only)
+  const [showCreateModal, setShowCreateModal] = useState(
+    !isPhysio && searchParams.get('new') === '1'
+  );
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -162,14 +167,16 @@ export function PatientDirectoryClient({
           )}
         </div>
 
-        <button
-          type="button"
-          onClick={() => setShowCreateModal(true)}
-          className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-xs sm:text-sm shadow-sm transition-colors shrink-0"
-        >
-          <UserPlus className="h-4 w-4" />
-          <span>+ Create Patient Profile</span>
-        </button>
+        {!isPhysio && (
+          <button
+            type="button"
+            onClick={() => setShowCreateModal(true)}
+            className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-xs sm:text-sm shadow-sm transition-colors shrink-0"
+          >
+            <UserPlus className="h-4 w-4" />
+            <span>+ Create Patient Profile</span>
+          </button>
+        )}
       </div>
 
       {/* Patient Directory Cards / Table */}
@@ -219,27 +226,31 @@ export function PatientDirectoryClient({
 
             {/* 1-Click Quick Actions */}
             <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-              <Link
-                href={`/crm/schedule?book=1&patientId=${patient.id}`}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-semibold shadow-sm transition-colors"
-              >
-                <CalendarPlus className="h-3.5 w-3.5" />
-                <span>Book Appointment</span>
-              </Link>
+              {!isPhysio && (
+                <>
+                  <Link
+                    href={`/crm/schedule?book=1&patientId=${patient.id}`}
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-semibold shadow-sm transition-colors"
+                  >
+                    <CalendarPlus className="h-3.5 w-3.5" />
+                    <span>Book Appointment</span>
+                  </Link>
 
-              <button
-                type="button"
-                disabled={sendingWaId === patient.id}
-                onClick={() => handleOneClickWhatsApp(patient)}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm transition-colors disabled:opacity-50"
-              >
-                {sendingWaId === patient.id ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <MessageSquare className="h-3.5 w-3.5" />
-                )}
-                <span>Send WhatsApp</span>
-              </button>
+                  <button
+                    type="button"
+                    disabled={sendingWaId === patient.id}
+                    onClick={() => handleOneClickWhatsApp(patient)}
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm transition-colors disabled:opacity-50"
+                  >
+                    {sendingWaId === patient.id ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <MessageSquare className="h-3.5 w-3.5" />
+                    )}
+                    <span>Send WhatsApp</span>
+                  </button>
+                </>
+              )}
 
               <Link
                 href={`/crm/patients/${patient.id}`}
