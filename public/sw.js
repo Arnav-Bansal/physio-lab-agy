@@ -1,5 +1,10 @@
-const CACHE_NAME = 'physiolab-crm-v1';
-const STATIC_ASSETS = ['/crm/login', '/icons/crm-icon.svg', '/icons/crm-icon-192.png', '/icons/crm-icon-512.png'];
+const CACHE_NAME = 'physiolab-crm-v2';
+const STATIC_ASSETS = [
+  '/crm/login',
+  '/icons/crm-icon-192.png',
+  '/icons/crm-icon-512.png',
+  '/icons/crm-icon-maskable-512.png',
+];
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
@@ -31,11 +36,9 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
 
   const url = new URL(request.url);
-  // Always go network-first for CRM pages and API routes so live clinic data is fresh
-  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/crm')) {
+  if (url.pathname.startsWith('/icons/')) {
     event.respondWith(
-      fetch(request).catch(() => caches.match(request))
+      caches.match(request).then((cached) => cached || fetch(request))
     );
-    return;
   }
 });

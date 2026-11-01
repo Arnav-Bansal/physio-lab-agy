@@ -15,6 +15,15 @@ export function middleware(request: NextRequest) {
     }
   }
 
+  // If already signed in to CRM and launching the PWA start_url (/crm/login), go straight to /crm
+  if (pathname === '/crm/login' && !request.nextUrl.searchParams.has('switch')) {
+    const crmCookie = request.cookies.get(CRM_SESSION_COOKIE)?.value;
+    if (crmCookie) {
+      const crmDashboardUrl = new URL('/crm', request.url);
+      return NextResponse.redirect(crmDashboardUrl);
+    }
+  }
+
   // Protect CRM routes (/crm/* except /crm/login)
   if (pathname.startsWith('/crm') && !pathname.startsWith('/crm/login')) {
     const crmCookie = request.cookies.get(CRM_SESSION_COOKIE)?.value;

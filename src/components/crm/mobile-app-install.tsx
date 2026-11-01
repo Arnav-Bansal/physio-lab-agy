@@ -33,9 +33,12 @@ export function CrmMobileAppInstall({
   const [platformTab, setPlatformTab] = useState<'ios' | 'android'>('ios');
 
   useEffect(() => {
-    // Register Service Worker for PWA installability
+    // Register Service Worker for PWA installability (force immediate update check)
     if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(() => undefined);
+      navigator.serviceWorker
+        .register('/sw.js', { updateViaCache: 'none' })
+        .then((reg) => reg.update().catch(() => undefined))
+        .catch(() => undefined);
     }
 
     // Detect if already running as installed PWA or Capacitor native app

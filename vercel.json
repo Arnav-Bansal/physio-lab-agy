@@ -30,6 +30,15 @@
       ]
     },
     {
+      "source": "/(sw\\.js|manifest\\.webmanifest)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    },
+    {
       "source": "/images/clinic/(.*)",
       "headers": [
         {
