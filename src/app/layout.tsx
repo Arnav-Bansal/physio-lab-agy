@@ -1,12 +1,32 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
+
+export const viewport: Viewport = {
+  themeColor: '#141E1E',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: 'cover',
+};
 
 export const metadata: Metadata = {
   title: 'The Physio Lab — Research & Rehabilitation | Ludhiana',
   description:
     'Evidence-based Physiotherapy, Research & Rehabilitation, Desmotec Sports Injury Centre, and Lifestyle Clinic in Barewal Awana, Ludhiana. Book appointments and access digital prescriptions online.',
+  manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'PhysioLab CRM',
+  },
   icons: {
-    icon: '/images/clinic/logo-mark.svg',
+    icon: [
+      { url: '/icons/crm-icon.svg', type: 'image/svg+xml' },
+      { url: '/icons/crm-icon-192.png', sizes: '192x192', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/icons/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
   },
 };
 

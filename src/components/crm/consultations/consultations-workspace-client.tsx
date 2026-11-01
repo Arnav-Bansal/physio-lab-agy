@@ -19,6 +19,7 @@ import {
   X,
   Search,
   Phone,
+  Camera,
 } from 'lucide-react';
 import type {
   AppointmentWithRelations,
@@ -657,21 +658,41 @@ export function ConsultationsWorkspaceClient({
                     </p>
                   </div>
 
-                  <label className="cursor-pointer inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-bold shadow-sm shrink-0 transition-colors">
-                    {uploadingFile ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <UploadCloud className="h-4 w-4" />
-                    )}
-                    <span>{uploadingFile ? 'Uploading...' : 'Upload PDF / Image'}</span>
-                    <input
-                      type="file"
-                      accept="application/pdf,image/jpeg,image/png,image/webp"
-                      onChange={handlePrescriptionUpload}
-                      disabled={uploadingFile}
-                      className="hidden"
-                    />
-                  </label>
+                  <div className="flex flex-wrap items-center gap-2 shrink-0">
+                    {/* Direct Mobile Camera Capture for iOS & Android Doctor App */}
+                    <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-white hover:bg-secondary text-primary border border-primary/30 text-xs font-bold shadow-sm shrink-0 transition-colors">
+                      {uploadingFile ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Camera className="h-4 w-4" />
+                      )}
+                      <span>Snap Rx Photo</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        onChange={handlePrescriptionUpload}
+                        disabled={uploadingFile}
+                        className="hidden"
+                      />
+                    </label>
+
+                    <label className="cursor-pointer inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-bold shadow-sm shrink-0 transition-colors">
+                      {uploadingFile ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <UploadCloud className="h-4 w-4" />
+                      )}
+                      <span>{uploadingFile ? 'Uploading...' : 'Upload PDF / Image'}</span>
+                      <input
+                        type="file"
+                        accept="application/pdf,image/jpeg,image/png,image/webp"
+                        onChange={handlePrescriptionUpload}
+                        disabled={uploadingFile}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
                 </div>
 
                 <input

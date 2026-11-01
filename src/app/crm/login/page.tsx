@@ -13,6 +13,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { BrandLogo } from '@/components/brand/logo';
+import { CrmMobileAppInstall } from '@/components/crm/mobile-app-install';
 
 const DEMO_CRM_PROFILES = [
   {
@@ -90,7 +91,7 @@ export default function CrmLoginPage() {
         </div>
       </header>
 
-      <main className="flex-1 flex items-center justify-center p-4 sm:p-6">
+      <main className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 gap-5">
         <form
           onSubmit={handleLogin}
           className="max-w-xl w-full bg-white rounded-2xl p-7 sm:p-9 border border-border shadow-xl space-y-6"
@@ -98,7 +99,7 @@ export default function CrmLoginPage() {
           <div>
             <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary">
               <ShieldCheck className="h-4 w-4" />
-              <span>Unified Web CRM Access</span>
+              <span>Unified Web &amp; Mobile CRM Access</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground mt-1">
               Staff, Physio &amp; Admin Login
@@ -158,12 +159,17 @@ export default function CrmLoginPage() {
               </>
             ) : (
               <>
-                <span>Sign In to Unified Web CRM</span>
+                <span>Sign In to Unified CRM</span>
                 <ArrowRight className="h-4 w-4" />
               </>
             )}
           </button>
         </form>
+
+        {/* Dedicated Staff & Doctor iOS / Android Mobile App Banner */}
+        <div className="max-w-xl w-full">
+          <CrmMobileAppInstall variant="login-card" />
+        </div>
       </main>
     </div>
   );

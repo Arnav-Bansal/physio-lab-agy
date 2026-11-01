@@ -23,8 +23,10 @@ import {
   X,
   Loader2,
   CalendarPlus,
+  Menu,
 } from 'lucide-react';
 import { BrandEmblem } from '@/components/brand/logo';
+import { CrmMobileAppInstall } from '@/components/crm/mobile-app-install';
 import { cn, formatPhoneDisplay } from '@/lib/utils';
 import type { CrmSession } from '@/lib/auth/session';
 import type { PatientRecord, UserRole } from '@/types/database.types';
@@ -112,6 +114,7 @@ export function CrmShell({
   const pathname = usePathname();
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Global Cmd+K Command Palette State
   const [cmdOpen, setCmdOpen] = useState(false);
@@ -126,6 +129,7 @@ export function CrmShell({
         setCmdOpen((prev) => !prev);
       } else if (e.key === 'Escape') {
         setCmdOpen(false);
+        setMobileMenuOpen(false);
       }
     }
     window.addEventListener('keydown', handleKeyDown);
@@ -160,7 +164,7 @@ export function CrmShell({
 
   return (
     <div className="min-h-screen flex w-full bg-stone-linen">
-      {/* Architectural Clinical Sidebar */}
+      {/* Architectural Clinical Sidebar (Desktop) */}
       <aside
         className={cn(
           'hidden lg:flex shrink-0 flex-col bg-[#141E1E] text-white border-r border-white/10 transition-all duration-200',
@@ -250,10 +254,12 @@ export function CrmShell({
           )}
         </div>
 
-        {/* Sidebar Footer: Profile & Role Switcher */}
+        {/* Sidebar Footer: Mobile App Installer + Profile & Role Switcher */}
         <div className="p-3 border-t border-white/10 space-y-2 bg-black/20">
+          {!collapsed && <CrmMobileAppInstall variant="sidebar" />}
+
           {!collapsed && (
-            <div className="px-2.5 py-1.5">
+            <div className="px-2.5 py-1">
               <p className="text-xs font-bold text-white truncate">{session.fullName}</p>
               <p className="text-[11px] text-white/55 truncate">{session.email}</p>
             </div>
@@ -295,10 +301,21 @@ export function CrmShell({
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 pb-16 lg:pb-0">
+      <div className="flex-1 flex flex-col min-w-0 pb-20 lg:pb-0">
         {/* Top Command Header Bar */}
-        <header className="sticky top-0 z-30 h-16 flex items-center justify-between gap-4 border-b border-border bg-white/95 backdrop-blur-md px-4 sm:px-6">
-          <div className="flex items-center gap-3 flex-1 max-w-xl">
+        <header className="sticky top-0 z-30 h-16 flex items-center justify-between gap-2.5 sm:gap-4 border-b border-border bg-white/95 backdrop-blur-md px-3 sm:px-6">
+          <div className="flex items-center gap-2.5 flex-1 max-w-xl min-w-0">
+            {/* Mobile App Drawer Button (< lg) */}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(true)}
+              className="lg:hidden inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[#141E1E] text-white shrink-0"
+              aria-label="Open Mobile CRM Menu"
+            >
+              <Menu className="h-4 w-4" />
+            </button>
+
+            {/* Desktop Sidebar Collapse Toggle (lg+) */}
             <button
               type="button"
               onClick={() => setCollapsed((c) => !c)}
@@ -312,12 +329,12 @@ export function CrmShell({
             <button
               type="button"
               onClick={() => setCmdOpen(true)}
-              className="w-full max-w-md flex items-center justify-between gap-3 px-3.5 py-2 rounded-xl bg-muted/60 hover:bg-muted border border-border text-xs text-muted-foreground transition-all"
+              className="w-full max-w-md flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-muted/60 hover:bg-muted border border-border text-xs text-muted-foreground transition-all min-w-0"
             >
               <span className="flex items-center gap-2 truncate">
                 <Search className="h-3.5 w-3.5 text-primary shrink-0" />
                 <span className="truncate">
-                  Quick search patients by name or phone...
+                  Search patients by name or phone...
                 </span>
               </span>
               <kbd className="hidden sm:inline-flex items-center gap-0.5 px-2 py-0.5 rounded bg-white border border-border font-mono text-[10px] font-semibold text-foreground shrink-0">
@@ -326,7 +343,9 @@ export function CrmShell({
             </button>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2 shrink-0">
+            <CrmMobileAppInstall variant="header" />
+
             <Link
               href="/crm/login"
               className="hidden sm:inline-flex items-center gap-1.5 rounded-xl bg-secondary px-3 py-1.5 text-xs font-bold text-secondary-foreground border border-primary/15 hover:bg-accent transition-colors"
@@ -339,7 +358,7 @@ export function CrmShell({
             {session.role !== 'physio' ? (
               <Link
                 href="/crm/schedule?book=1"
-                className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-2 text-xs font-bold text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 sm:px-3.5 py-2 text-xs font-bold text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors"
               >
                 <Plus className="h-3.5 w-3.5" />
                 <span>Book Slot</span>
@@ -347,10 +366,10 @@ export function CrmShell({
             ) : (
               <Link
                 href="/crm/consultations"
-                className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-2 text-xs font-bold text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 sm:px-3.5 py-2 text-xs font-bold text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors"
               >
                 <Stethoscope className="h-3.5 w-3.5" />
-                <span>Open Charts</span>
+                <span>Charts</span>
               </Link>
             )}
           </div>
@@ -361,10 +380,104 @@ export function CrmShell({
         </main>
       </div>
 
-      {/* Mobile Bottom Nav */}
+      {/* Mobile Slide-Over App Drawer (< lg) for Role Switching, App Install & Shortcuts */}
+      {mobileMenuOpen && (
+        <div
+          className="lg:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex"
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          <div
+            className="w-72 max-w-[85vw] bg-[#141E1E] text-white h-full p-5 flex flex-col justify-between overflow-y-auto shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="space-y-6">
+              <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                <Link
+                  href="/crm"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2.5"
+                >
+                  <BrandEmblem className="h-8 w-8" />
+                  <div>
+                    <p className="text-sm font-bold text-white">PhysioLab CRM</p>
+                    <p className="text-[11px] text-[#2DD4BF]">Staff &amp; Doctor App</p>
+                  </div>
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="p-1.5 rounded-lg bg-white/10 text-white"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              {/* Active User Card */}
+              <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-1">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-[#2DD4BF]">
+                  Signed in as {session.role}
+                </span>
+                <p className="text-sm font-bold text-white">Welcome, {session.fullName}</p>
+                <p className="text-xs text-white/60 truncate">{session.email}</p>
+              </div>
+
+              {/* Navigation Links */}
+              <nav className="space-y-1">
+                {visibleMainNav.map((item) => {
+                  const Icon = item.icon;
+                  const active = item.exact
+                    ? pathname === item.href
+                    : pathname.startsWith(item.href);
+                  const displayLabel =
+                    session.role === 'physio' && item.physioLabel ? item.physioLabel : item.label;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={cn(
+                        'flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-semibold transition-all',
+                        active
+                          ? 'bg-primary text-white'
+                          : 'text-white/75 hover:bg-white/10 hover:text-white'
+                      )}
+                    >
+                      <Icon className="h-4 w-4 shrink-0" />
+                      <span>{displayLabel}</span>
+                    </Link>
+                  );
+                })}
+              </nav>
+            </div>
+
+            <div className="space-y-2.5 pt-4 border-t border-white/10">
+              <CrmMobileAppInstall variant="sidebar" />
+
+              <Link
+                href="/crm/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-semibold text-white bg-white/10 hover:bg-white/15"
+              >
+                <RefreshCw className="h-3.5 w-3.5 text-[#2DD4BF]" />
+                <span>Switch Role ({session.role})</span>
+              </Link>
+
+              <a
+                href="/api/auth/logout?next=/crm/login"
+                className="flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-red-400 hover:bg-red-500/20"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+                <span>Sign Out of CRM</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Bottom Tab Navigation (Native App Style) */}
       <nav
         className={cn(
-          'lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-border px-2 py-1.5 grid gap-1',
+          'lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-border px-2 pt-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))] grid gap-1 shadow-lg',
           visibleMainNav.length === 4
             ? 'grid-cols-4'
             : visibleMainNav.length === 5
@@ -384,8 +497,8 @@ export function CrmShell({
               key={item.href}
               href={item.href}
               className={cn(
-                'flex flex-col items-center justify-center py-1.5 rounded-xl text-[10px] font-semibold',
-                active ? 'bg-primary text-white' : 'text-muted-foreground'
+                'flex flex-col items-center justify-center py-1.5 rounded-xl text-[10px] font-semibold transition-colors',
+                active ? 'bg-primary text-white shadow-sm' : 'text-muted-foreground'
               )}
             >
               <Icon className="h-4 w-4 mb-0.5" />

@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="112" fill="#141E1E"/>
+  <rect x="20" y="20" width="472" height="472" rx="96" fill="none" stroke="#00858E" stroke-width="8" stroke-opacity="0.45"/>
+  <g transform="translate(56, 48) scale(3.333)">
+    <!-- Outer clinical circle -->
+    <circle cx="60" cy="60" r="50" stroke="#2DD4BF" stroke-width="4" fill="#00858E" fill-opacity="0.18" />
+    <!-- Outer left and right lotus petals -->
+    <path
+      d="M60 95 C26 92 14 64 23 36 C38 42 50 62 60 95 Z"
+      stroke="#5EEAD4"
+      stroke-width="3.5"
+      stroke-linejoin="round"
+      fill="#00858E"
+      fill-opacity="0.35"
+    />
+    <path
+      d="M60 95 C94 92 106 64 97 36 C82 42 70 62 60 95 Z"
+      stroke="#5EEAD4"
+      stroke-width="3.5"
+      stroke-linejoin="round"
+      fill="#00858E"
+      fill-opacity="0.35"
+    />
+    <!-- Mid left and right lotus petals -->
+    <path
+      d="M60 95 C34 80 30 48 42 22 C52 36 57 58 60 95 Z"
+      stroke="#FFFFFF"
+      stroke-width="3.5"
+      stroke-linejoin="round"
+      fill="#2DD4BF"
+      fill-opacity="0.25"
+    />
+    <path
+      d="M60 95 C86 80 90 48 78 22 C68 36 63 58 60 95 Z"
+      stroke="#FFFFFF"
+      stroke-width="3.5"
+      stroke-linejoin="round"
+      fill="#2DD4BF"
+      fill-opacity="0.25"
+    />
+    <!-- Center upright lotus petal -->
+    <path
+      d="M60 12 C47 34 47 66 60 95 C73 66 73 34 60 12 Z"
+      stroke="#FFFFFF"
+      stroke-width="4"
+      stroke-linejoin="round"
+      fill="#00858E"
+    />
+    <!-- Central anatomical spine / rehabilitation axis -->
+    <line x1="60" y1="22" x2="60" y2="94" stroke="#5EEAD4" stroke-width="3" stroke-linecap="round" />
+    <circle cx="60" cy="34" r="3.5" fill="#FFFFFF" />
+    <circle cx="60" cy="46" r="4" fill="#FFFFFF" />
+    <circle cx="60" cy="58" r="4" fill="#FFFFFF" />
+    <circle cx="60" cy="70" r="3.5" fill="#FFFFFF" />
+    <circle cx="60" cy="81" r="3" fill="#FFFFFF" />
+  </g>
+</svg>
