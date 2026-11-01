@@ -11,6 +11,8 @@ const config: CapacitorConfig = {
     url: serverUrl,
     cleartext: true,
     allowNavigation: [
+      'thephysiolabs.com',
+      '*.thephysiolabs.com',
       'physio-lab-agy.vercel.app',
       '*.vercel.app',
       'localhost',

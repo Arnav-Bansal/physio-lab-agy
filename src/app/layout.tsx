@@ -10,6 +10,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://thephysiolabs.com'),
   title: 'The Physio Lab — Research & Rehabilitation | Ludhiana',
   description:
     'Evidence-based Physiotherapy, Research & Rehabilitation, Desmotec Sports Injury Centre, and Lifestyle Clinic in Barewal Awana, Ludhiana. Book appointments and access digital prescriptions online.',

@@ -219,7 +219,7 @@ export function CrmMobileAppInstall({
                         1. Tap the Share button in Safari
                       </p>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        Open <strong>physio-lab-agy.vercel.app/crm</strong> in Safari on your iPhone
+                        Open <strong>thephysiolabs.com/crm</strong> in Safari on your iPhone
                         or iPad and tap the bottom <strong>Share</strong> icon.
                       </p>
                     </div>
