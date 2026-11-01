@@ -197,10 +197,10 @@ class SupabasePatientRepository implements IPatientRepository {
     if (error) throw new Error(`Failed to load unified patient history: ${error.message}`);
     const rows = (data ?? []) as UnifiedPatientHistoryItem[];
 
-    // Generate short-lived signed URLs for any attached prescriptions
-    for (const row of rows) {
-      if (Array.isArray(row.prescriptions) && row.prescriptions.length > 0) {
-        for (const p of row.prescriptions) {
+    // Generate short-lived signed URLs in parallel for any attached prescriptions
+    await Promise.all(
+      rows.flatMap((row) =>
+        (Array.isArray(row.prescriptions) ? row.prescriptions : []).map(async (p) => {
           if (p.storage_path && !p.storage_path.startsWith('/')) {
             const { data: signed } = await supabase.storage
               .from('prescriptions')
@@ -209,9 +209,9 @@ class SupabasePatientRepository implements IPatientRepository {
           } else {
             p.signed_url = p.storage_path;
           }
-        }
-      }
-    }
+        })
+      )
+    );
 
     return rows;
   }
@@ -426,11 +426,11 @@ class SupabaseAppointmentRepository implements IAppointmentRepository {
         *,
         clinic:clinics(id, name, slug, address, phone),
         patient:patients(id, full_name, phone, gender, date_of_birth),
-        physio:profiles!appointments_physio_id_fkey(id, full_name, specialization, calendar_color),
-        consultation:consultations(*)
+        physio:profiles!appointments_physio_id_fkey(id, full_name, specialization, calendar_color)
       `
       )
-      .order('start_time', { ascending: true });
+      .order('start_time', { ascending: true })
+      .limit(200);
 
     if (filter?.clinicId) query = query.eq('clinic_id', filter.clinicId);
     if (filter?.physioId) query = query.eq('physio_id', filter.physioId);
@@ -528,7 +528,8 @@ class SupabaseConsultationRepository implements IConsultationRepository {
         prescriptions(*)
       `
       )
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(100);
 
     if (clinicId) query = query.eq('clinic_id', clinicId);
     if (physioId) query = query.eq('physio_id', physioId);
@@ -600,7 +601,8 @@ class SupabaseConsultationRepository implements IConsultationRepository {
       `
       )
       .eq('patient_id', patientId)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(100);
 
     if (error) throw new Error(`Failed to load prescriptions: ${error.message}`);
 
@@ -608,16 +610,18 @@ class SupabaseConsultationRepository implements IConsultationRepository {
       ReturnType<IConsultationRepository['listPatientPrescriptions']>
     >;
 
-    for (const item of rows) {
-      if (item.storage_path && !item.storage_path.startsWith('/')) {
-        const { data: signed } = await supabase.storage
-          .from('prescriptions')
-          .createSignedUrl(item.storage_path, 60 * 15);
-        item.signed_url = signed?.signedUrl ?? null;
-      } else {
-        item.signed_url = item.storage_path;
-      }
-    }
+    await Promise.all(
+      rows.map(async (item) => {
+        if (item.storage_path && !item.storage_path.startsWith('/')) {
+          const { data: signed } = await supabase.storage
+            .from('prescriptions')
+            .createSignedUrl(item.storage_path, 60 * 15);
+          item.signed_url = signed?.signedUrl ?? null;
+        } else {
+          item.signed_url = item.storage_path;
+        }
+      })
+    );
 
     return rows;
   }

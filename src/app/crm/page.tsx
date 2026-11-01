@@ -173,6 +173,7 @@ export default async function CrmDashboardPage() {
           )}
           <Link
             href="/crm/consultations"
+            prefetch={true}
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-muted/70 hover:bg-muted text-foreground text-xs font-bold border border-border transition-colors"
           >
             <Stethoscope className="h-4 w-4 text-primary" />
@@ -215,6 +216,7 @@ export default async function CrmDashboardPage() {
             <Link
               key={item.title}
               href={item.href}
+              prefetch={true}
               className="group rounded-2xl border border-border bg-white p-5 shadow-sm hover:shadow-md hover:border-primary/40 transition-all flex flex-col justify-between space-y-4"
             >
               <div className="flex items-center justify-between">

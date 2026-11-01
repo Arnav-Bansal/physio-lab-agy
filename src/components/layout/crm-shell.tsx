@@ -115,12 +115,27 @@ export function CrmShell({
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
 
   // Global Cmd+K Command Palette State
   const [cmdOpen, setCmdOpen] = useState(false);
   const [cmdQuery, setCmdQuery] = useState('');
   const [cmdPatients, setCmdPatients] = useState<PatientRecord[]>([]);
   const [cmdLoading, setCmdLoading] = useState(false);
+
+  // Clear optimistic pending tab state once pathname catches up
+  useEffect(() => {
+    setPendingHref(null);
+  }, [pathname]);
+
+  // Eagerly prefetch all allowed CRM routes in the background for near-zero tab switch latency
+  useEffect(() => {
+    if (!session) return;
+    const allowed = MAIN_NAV.filter((item) => item.allowedRoles.includes(session.role));
+    allowed.forEach((item) => {
+      router.prefetch(item.href);
+    });
+  }, [session, router]);
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -200,9 +215,10 @@ export function CrmShell({
             <nav className="space-y-1">
               {visibleMainNav.map((item) => {
                 const Icon = item.icon;
+                const activePath = pendingHref || pathname;
                 const active = item.exact
-                  ? pathname === item.href
-                  : pathname.startsWith(item.href);
+                  ? activePath === item.href
+                  : activePath.startsWith(item.href);
                 const displayLabel =
                   session.role === 'physio' && item.physioLabel ? item.physioLabel : item.label;
 
@@ -210,6 +226,8 @@ export function CrmShell({
                   <Link
                     key={item.href}
                     href={item.href}
+                    prefetch={true}
+                    onClick={() => setPendingHref(item.href)}
                     title={displayLabel}
                     className={cn(
                       'flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs sm:text-sm transition-all',
@@ -265,7 +283,7 @@ export function CrmShell({
             </div>
           )}
           <Link
-            href="/crm/login"
+            href="/crm/login?switch=1"
             title="Switch Staff/Doctor Role"
             className="flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-xs font-semibold text-white bg-white/10 hover:bg-white/15 transition-colors"
           >
@@ -347,7 +365,7 @@ export function CrmShell({
             <CrmMobileAppInstall variant="header" />
 
             <Link
-              href="/crm/login"
+              href="/crm/login?switch=1"
               className="hidden sm:inline-flex items-center gap-1.5 rounded-xl bg-secondary px-3 py-1.5 text-xs font-bold text-secondary-foreground border border-primary/15 hover:bg-accent transition-colors"
             >
               <span className="h-2 w-2 rounded-full bg-primary" />
@@ -425,16 +443,21 @@ export function CrmShell({
               <nav className="space-y-1">
                 {visibleMainNav.map((item) => {
                   const Icon = item.icon;
+                  const activePath = pendingHref || pathname;
                   const active = item.exact
-                    ? pathname === item.href
-                    : pathname.startsWith(item.href);
+                    ? activePath === item.href
+                    : activePath.startsWith(item.href);
                   const displayLabel =
                     session.role === 'physio' && item.physioLabel ? item.physioLabel : item.label;
                   return (
                     <Link
                       key={item.href}
                       href={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
+                      prefetch={true}
+                      onClick={() => {
+                        setPendingHref(item.href);
+                        setMobileMenuOpen(false);
+                      }}
                       className={cn(
                         'flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-semibold transition-all',
                         active
@@ -454,7 +477,7 @@ export function CrmShell({
               <CrmMobileAppInstall variant="sidebar" />
 
               <Link
-                href="/crm/login"
+                href="/crm/login?switch=1"
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-semibold text-white bg-white/10 hover:bg-white/15"
               >
@@ -487,15 +510,18 @@ export function CrmShell({
       >
         {visibleMainNav.map((item) => {
           const Icon = item.icon;
+          const activePath = pendingHref || pathname;
           const active = item.exact
-            ? pathname === item.href
-            : pathname.startsWith(item.href);
+            ? activePath === item.href
+            : activePath.startsWith(item.href);
           const displayLabel =
             session.role === 'physio' && item.physioLabel ? item.physioLabel : item.label;
           return (
             <Link
               key={item.href}
               href={item.href}
+              prefetch={true}
+              onClick={() => setPendingHref(item.href)}
               className={cn(
                 'flex flex-col items-center justify-center py-1.5 rounded-xl text-[10px] font-semibold transition-colors',
                 active ? 'bg-primary text-white shadow-sm' : 'text-muted-foreground'
